@@ -10,7 +10,8 @@ codex-dev-harness/
 ├── .githooks/pre-commit              # 任意の安全チェック
 ├── skills/
 │   ├── repo-research/SKILL.md        # 未知のリポジトリ・仕様の事前調査
-│   └── reverse-engineering/SKILL.md  # 許可された対象の挙動解析
+│   ├── reverse-engineering/SKILL.md  # 許可された対象の挙動解析
+│   └── github-operations/SKILL.md    # 明示依頼時のGitHub同期・操作
 ├── scripts/
 │   ├── install-githooks.ps1
 │   └── install-skills.ps1
@@ -34,6 +35,16 @@ pwsh ./scripts/install-githooks.ps1
 ```
 
 解除する場合は対象リポジトリで `git config --unset core.hooksPath` を実行してください。
+
+## GitHub操作
+
+GitHubへの作成・同期・push・pull・Issue・Pull Requestなどを依頼されたときだけ、`skills/github-operations/SKILL.md`を適用します。通常のローカル開発では自動的にGitHubへ書き込みません。
+
+- 複数ファイルをローカルから同期する場合は、ローカルGitで一つのレビュー可能なコミットを作り、pushします。ファイルごとのAPI更新は使いません。
+- リモート上の単一テキストファイルだけを更新する場合は、最新の内容とblob SHAを取得してからGitHub connectorで更新します。同じパスへの書き込みは並列化しません。
+- リポジトリの存在確認は検索結果だけで判断せず、正確な`owner/name`またはURLでメタデータを取得します。
+- 新規リポジトリ作成機能が接続先にない場合は、認証済みGitHub UIまたはインストール済みの`gh`へフォールバックします。既存のローカルツリーをpushする場合は、README・`.gitignore`・LICENSEの自動初期化をオフにします。
+- push後はリモートrefまたはGitHub connectorの読み取りで、対象ブランチとコミットを検証します。
 
 ## 運用方針
 
