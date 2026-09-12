@@ -28,6 +28,7 @@
 4. 秘密鍵検出の正規表現が、追加行の先頭から始まるマーカーを見逃していた。
 5. CIと再現可能な検証コマンドがなく、これらの不変条件を継続的に保護できなかった。
 6. 改行コードの規則がなく、WindowsとLinux間でshell scriptが壊れる余地があった。
+7. 最初のCI定義ではpip cacheの依存ファイルを明示せず、旧Node runtimeのActionsも使っていたため、初回実行が失敗した。
 
 ## 実施した改善
 
@@ -36,6 +37,7 @@
 - pre-commitの2件の判定不具合を修正し、環境変数テンプレート、秘密ファイル名、秘密鍵マーカー、空白エラーの挙動テストを追加した。
 - shell entry pointを実行可能として記録し、`.gitattributes`と`.editorconfig`を追加した。
 - PyYAMLを使うskill validator、Dockerを使うWindows向け検証入口、読み取り専用のGitHub Actions検証を追加した。
+- GitHub ActionsをNode 24対応版へ更新し、pip cacheの依存ファイルを明示した。
 - `.env.example`、`.env.sample`、`.env.template`を保持できる保守的な`.gitignore`を追加した。
 
 ## 100点にしなかった理由
