@@ -1,6 +1,6 @@
 # Codex 開発ハーネス
 
-Codex をソフトウェア開発に使うための、再利用可能な最小構成です。常時読み込むルールと、必要なときだけ使う調査 skill、任意で有効化する Git hook を分離しています。
+Codex をソフトウェア開発に使うための、再利用可能な最小構成です。常時読み込むルール、必要時だけ使う task skill、複数 workflow で共有する cross-cutting contract、任意の Git hook を分離しています。
 
 ## 構成
 
@@ -11,19 +11,33 @@ codex-dev-harness/
 ├── .githooks/pre-commit              # 任意の安全チェック
 ├── .gitattributes / .editorconfig    # 改行・文字コード規約
 ├── .gitignore / requirements-dev.txt # 除外規則・検証依存関係
-├── docs/                              # 品質監査の記録
+├── docs/
+│   ├── harness-architecture.md       # 共通契約・改善ゲート
+│   └── quality-audit-2026-09-12.md
 ├── skills/
-│   ├── repo-research/SKILL.md        # 未知のリポジトリ・仕様の事前調査
-│   ├── reverse-engineering/SKILL.md  # 許可された対象の挙動解析
-│   └── github-operations/SKILL.md    # 明示依頼時のGitHub同期・操作
+│   ├── repo-research/SKILL.md
+│   ├── reverse-engineering/SKILL.md
+│   ├── github-operations/SKILL.md
+│   └── self-improvement/SKILL.md     # 評価駆動の自己改善
 ├── scripts/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
 │   ├── validate-harness.ps1
 │   └── validate-skills.py
-├── tests/test-pre-commit.sh           # hookの挙動テスト
-└── templates/codex-progress.md       # 長時間・複数セッション作業の引き継ぎ用
+├── tests/test-pre-commit.sh
+└── templates/codex-progress.md
 ```
+
+## アーキテクチャ
+
+ハーネスは4層に分けます。
+
+1. `AGENTS.md`: 全作業に必要な不変条件だけを常時適用する。
+2. `skills/`: 特定条件でのみ読み込む task-specific 手順を置く。
+3. `docs/harness-architecture.md`: execution/evaluation/design/optimization の共通契約を定義する。
+4. `scripts/`, `tests/`, CI: deterministic な不変条件をモデル判断より先に検証する。
+
+詳細は `docs/harness-architecture.md` を参照してください。
 
 ## 導入
 
@@ -54,6 +68,17 @@ pwsh ./scripts/validate-harness.ps1
 ホストPythonに`requirements-dev.txt`の依存関係が導入済みなら、`-SkipDocker`でも実行できます。GitHub ActionsでもpushとPull Requestごとに同じ不変条件を確認します。
 
 最新の採点基準、検出した問題、改善内容は`docs/quality-audit-2026-09-12.md`に記録しています。
+
+## 自己改善
+
+既存エージェントや workflow を反復改善する場合は `skills/self-improvement/SKILL.md` を使います。
+
+- train/optimization data と hold-out 評価データを分離する。
+- 1 iteration の変更範囲を明示する。
+- best-so-far を評価前に上書きしない。
+- deterministic evaluator を優先する。
+- aggregate score だけでなく failure type ごとの退行を確認する。
+- 評価が unresolved の候補は採用しない。
 
 ## GitHub操作
 
