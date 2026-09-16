@@ -1,6 +1,6 @@
 # Harness architecture
 
-The harness separates always-on instructions, conditional task skills, cross-cutting contracts, and mechanical validation. This follows the broad OpenAI Harness Engineering principle of keeping the always-on instruction surface small and promoting stable invariants into repository-local checks.
+The harness separates always-on instructions, conditional task skills, cross-cutting contracts, project baselines, and mechanical validation. This follows the broad OpenAI Harness Engineering principle of keeping the always-on instruction surface small and promoting stable invariants into repository-local checks.
 
 ## Layers
 
@@ -8,10 +8,20 @@ The harness separates always-on instructions, conditional task skills, cross-cut
    - only invariants and routing that apply to ordinary work.
 2. **Task skills — `skills/*/SKILL.md`**
    - detailed procedures loaded only when their trigger conditions apply.
-3. **Cross-cutting contracts — this document / schemas**
+3. **Project baseline — `docs/project-baseline.md`**
+   - reusable defaults such as canonical specifications, Docker reproducibility, and Python/Ruff quality gates without forcing project-specific architecture.
+4. **Cross-cutting contracts — this document / schemas**
    - task goals and acceptance, execution provenance, evaluation decisions, design source-of-truth, optimization records.
-4. **Mechanical enforcement — `scripts/`, `tests/`, CI**
+5. **Mechanical enforcement — `scripts/`, `tests/`, CI**
    - checks stable invariants without relying on model judgment.
+
+## Project specification source
+
+For target repositories, durable current product/system requirements should have one canonical repository-local home. The harness convention is `docs/specs/` unless the project already has an equivalent single source of truth.
+
+Specifications define **what must be true**. Architecture documents define **how the system is structured**. Issues and progress files define **what is being changed now**. Historical records explain superseded decisions. Do not let these roles collapse into one large instruction file.
+
+Before a requirement-sensitive implementation or design change, load the relevant specification rather than the entire documentation tree. If code and specification conflict, surface the conflict instead of silently treating either source as authoritative without resolving currency.
 
 ## Task contract
 
