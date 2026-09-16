@@ -2,7 +2,7 @@
 
 This document defines the reusable project-level defaults that sit between the global harness rules and project-specific architecture.
 
-The baseline is intentionally small. It standardizes reproducibility, Python quality gates, and the location of durable specifications without forcing one Web framework, repository layout, database, or service topology.
+The baseline is intentionally small. It standardizes reproducibility, GitHub CI, Python quality gates, and the location of durable specifications without forcing one Web framework, repository layout, database, or service topology.
 
 ## Canonical specifications
 
@@ -36,11 +36,30 @@ Do not require Docker Compose for a single-container project. Use Compose or ano
 
 Do not infer a microservice architecture from the Docker requirement. A monolith, full-stack framework, worker, CLI, API service, or multi-service application can all satisfy the baseline.
 
+## GitHub CI baseline
+
+For executable software hosted on GitHub, GitHub Actions is the canonical remote quality gate.
+
+The repository must provide a workflow that runs for pull requests and for pushes to the default branch. The workflow should execute the checks that are mechanically meaningful for that project, including as applicable:
+
+- lint and format checks;
+- automated tests;
+- static type checks;
+- application, package, or container build verification;
+- repository invariants and domain-specific validators;
+- existing security or dependency checks that are already part of the project's canonical validation path.
+
+Local and Docker-based checks are preflight evidence, not a substitute for the remote gate. When work is pushed or proposed through a pull request, do not treat it as complete until the expected GitHub Actions checks pass. If a required workflow is missing, cannot run because of repository infrastructure, or fails for an external reason, report that state explicitly rather than claiming remote verification succeeded.
+
+Do not weaken CI only to obtain a green result. Do not add `continue-on-error`, skip relevant tests, reduce coverage or validation thresholds, or remove required checks solely to make a change mergeable.
+
+When repository permissions and project policy allow it, protect the default branch or use a ruleset so the canonical workflow checks are required before merge. Repository settings remain an explicit GitHub administration action; do not change them without authorization.
+
 ## Python baseline: Ruff
 
 Every repository containing maintained Python code uses Ruff as the standard lint and format gate, including existing repositories.
 
-At minimum, the canonical validation path runs:
+At minimum, the canonical validation path and GitHub Actions run:
 
 ```text
 ruff check ...
@@ -51,7 +70,7 @@ Configuration belongs in the target repository, normally in `pyproject.toml`. Th
 
 When an existing project uses overlapping tools, converge their overlapping responsibilities on Ruff instead of retaining duplicate permanent gates without a reason. Typical overlap includes Flake8, isort, pyupgrade, and Black.
 
-Ruff does not replace orthogonal checks. Keep tools such as pytest, mypy, pyright, security scanners, or domain-specific validators when the project needs them.
+Ruff does not replace orthogonal checks. Keep tools such as pytest, mypy, pyright, security scanners, or domain-specific validators when the project needs them, and run them in GitHub Actions when they are part of the project's canonical merge gate.
 
 Migration of an existing project should be reviewable. Do not combine a broad whole-repository reformat with an unrelated feature change unless that migration is itself the requested task.
 
