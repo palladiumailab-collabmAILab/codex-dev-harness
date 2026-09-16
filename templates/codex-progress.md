@@ -4,6 +4,14 @@
 
 <!-- One sentence describing the requested outcome. -->
 
+## Acceptance criteria
+
+| ID | Criterion | Evidence | Status |
+|---|---|---|---|
+| AC-1 |  |  |  |
+
+<!-- If a criterion is materially ambiguous, clarify it with the user before implementation. -->
+
 ## Current state
 
 - Branch or revision:
@@ -11,6 +19,8 @@
 - Current implementation boundary:
 
 ## Completed
+
+<!-- Record material outcome-changing work here. Validation-only reruns belong under Verification. -->
 
 -
 
@@ -20,9 +30,9 @@
 
 ## Verification
 
-| Command | Result | Notes |
-|---|---|---|
-|  |  |  |
+| Command / check | Criteria | Result | Notes |
+|---|---|---|---|
+|  |  |  |  |
 
 ## Decisions
 
