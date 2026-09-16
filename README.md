@@ -39,7 +39,9 @@ codex-dev-harness/
 
 - 長期に有効な製品・システム仕様は `docs/specs/` に集約し、実装判断より先に関連仕様を参照する。
 - 実行可能なソフトウェアは Docker で再現可能な開発・検証経路を持つ。
-- Python を含むリポジトリでは、新規・既存を問わず Ruff を lint / format の標準品質ゲートにする。
+- GitHubで管理する実行可能なソフトウェアでは、GitHub Actions を標準の遠隔品質ゲートとし、PRとdefault branch pushでプロジェクト固有の検証を実行する。
+- Python を含むリポジトリでは、新規・既存を問わず Ruff を lint / format の標準品質ゲートにし、GitHub Actionsでも実行する。
+- テスト、型チェック、build、repository invariant、domain validator 等は適用範囲に応じてCIへ載せ、ローカル成功だけで完了扱いしない。
 - Webアプリの `frontend/` / `backend/` 物理分離、framework、DB、service topology はプロジェクト固有とし、ハーネスから一律強制しない。
 
 `templates/project-specs/README.md` は対象リポジトリの `docs/specs/README.md` として利用できます。既存仕様書がある場合は、上書きせず正本を一つに整理します。
@@ -92,6 +94,8 @@ pwsh ./scripts/validate-harness.ps1
 ```
 
 既定では Docker を使い、ハーネス自身の Ruff lint / format と skill validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。GitHub Actionsでもpush/PRごとに同じ主要不変条件を確認します。
+
+対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
 ## モデル既定
 
