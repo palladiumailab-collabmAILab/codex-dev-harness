@@ -1,6 +1,6 @@
 # Codex 開発ハーネス
 
-Codex をソフトウェア開発に使うための、再利用可能な最小構成です。常時読み込むルールと、必要なときだけ使う調査 skill、任意で有効化する Git hook を分離しています。
+Codex をソフトウェア開発に使うための、再利用可能な最小構成です。常時読み込むルール、必要時だけ使う task skill、複数 workflow で共有する cross-cutting contract、任意の Git hook を分離しています。
 
 ## 構成
 
@@ -11,19 +11,33 @@ codex-dev-harness/
 ├── .githooks/pre-commit              # 任意の安全チェック
 ├── .gitattributes / .editorconfig    # 改行・文字コード規約
 ├── .gitignore / requirements-dev.txt # 除外規則・検証依存関係
-├── docs/                              # 品質監査の記録
+├── docs/
+│   ├── harness-architecture.md       # 共通契約・改善ゲート
+│   └── quality-audit-2026-09-12.md
 ├── skills/
-│   ├── repo-research/SKILL.md        # 未知のリポジトリ・仕様の事前調査
-│   ├── reverse-engineering/SKILL.md  # 許可された対象の挙動解析
-│   └── github-operations/SKILL.md    # 明示依頼時のGitHub同期・操作
+│   ├── repo-research/SKILL.md
+│   ├── reverse-engineering/SKILL.md
+│   ├── github-operations/SKILL.md
+│   └── self-improvement/SKILL.md     # 評価駆動の自己改善
 ├── scripts/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
 │   ├── validate-harness.ps1
 │   └── validate-skills.py
-├── tests/test-pre-commit.sh           # hookの挙動テスト
-└── templates/codex-progress.md       # 長時間・複数セッション作業の引き継ぎ用
+├── tests/test-pre-commit.sh
+└── templates/codex-progress.md
 ```
+
+## アーキテクチャ
+
+ハーネスは4層に分けます。
+
+1. `AGENTS.md`: 全作業に必要な不変条件だけを常時適用する。
+2. `skills/`: 特定条件でのみ読み込む task-specific 手順を置く。
+3. `docs/harness-architecture.md`: execution/evaluation/design/optimization の共通契約を定義する。
+4. `scripts/`, `tests/`, CI: deterministic な不変条件をモデル判断より先に検証する。
+
+詳細は `docs/harness-architecture.md` を参照してください。
 
 ## 導入
 
@@ -55,6 +69,20 @@ pwsh ./scripts/validate-harness.ps1
 
 最新の採点基準、検出した問題、改善内容は`docs/quality-audit-2026-09-12.md`に記録しています。
 
+## 自己改善
+
+既存エージェントや workflow を反復改善する場合は `skills/self-improvement/SKILL.md` を使います。
+
+- train/optimization data と hold-out 評価データを分離する。
+- 1 iteration の変更範囲を明示する。
+- best-so-far を評価前に上書きしない。
+- exact invariant は deterministic evaluator を優先し、semantic / trajectory 品質は必要に応じて model grader を使う。
+- aggregate score だけでなく failure type ごとの退行を確認する。
+- `min_improvement` / `allowed_regression` / critical metric を事前定義し、単発の小さなスコア差を改善とみなさない。
+- 評価が unresolved の候補は採用しない。
+
+実行可能なJSON Schema、validator、CI強制は Issue #7 で追加する。
+
 ## GitHub操作
 
 GitHubへの作成・同期・push・pull・Issue・Pull Requestなどを依頼されたときだけ、`skills/github-operations/SKILL.md`を適用します。通常のローカル開発では自動的にGitHubへ書き込みません。
@@ -67,9 +95,11 @@ GitHubへの作成・同期・push・pull・Issue・Pull Requestなどを依頼�
 
 ## 運用方針
 
-- 複数モジュールにまたがる実装、設計判断、難しいデバッグ、最終レビューは `gpt-5.6-sol` を優先します。
-- 短い探索、ファイル一覧化、機械的な整形、独立した読み取り専用チェックは `gpt-5.6-luna` を優先します。
-- ユーザーがモデルを指定した場合はそれを優先し、別モデルへ黙って置き換えません。
+- 親エージェント、複数モジュールの実装、設計判断、難しいデバッグ、最終レビューは `gpt-5.6-sol / medium` を既定とします。
+- 短い探索、候補抽出、機械的整形、独立した読み取り専用チェックは `gpt-5.6-luna / max` を既定とします。
+- Luna/max が受け入れ条件を満たさない場合は同じ失敗を反復せず、証拠を引き継いで Sol/medium へ昇格します。
+- Sol のより高い reasoning effort や別モデルは、ユーザー指定または repo-local eval で測定可能な改善が確認された場合だけ使います。既定経路を3段以上に増やしません。
+- ユーザーがモデルを指定した場合はそれを優先します。
 - 小さな単一ファイル修正にサブエージェントを使うと、調整コストが勝ちやすいため使いません。
 - サブエージェントは総トークンを通常増やしますが、独立した読み取り中心の作業を分離すると主スレッドの文脈汚染と所要時間を抑えられます。効果が調整コストを上回る場合だけ使い、親エージェントが最終判断と編集を担当します。
 - 未知のリポジトリを調べるときだけ `repo-research`、挙動解析が必要なときだけ `reverse-engineering` を使います。通常の実装でこれらを自動実行しません。
@@ -77,14 +107,16 @@ GitHubへの作成・同期・push・pull・Issue・Pull Requestなどを依頼�
 
 ## 設計根拠
 
-構成を更新するときは、まず次の一次資料を確認してください。
+構成を更新するときは、まず OpenAI の一次資料を確認してください。
 
-- [OpenAI Models](https://developers.openai.com/api/docs/models): Sol を複雑な専門作業、Luna をコスト重視の高頻度作業として位置づけています。
+- [OpenAI: Harness engineering](https://openai.com/index/harness-engineering/): 巨大な`AGENTS.md`ではなく短い入口と構造化されたrepo-local docsを使い、重要な不変条件をlint・構造テスト・CIで機械的に強制する方針を反映しています。
+- [OpenAI: GPT-5.6 Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol): Sol を complex professional work 向けのflagshipとして位置づけ、`medium`を既定reasoning effortとして提供しています。
+- [OpenAI: GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna): Luna を cost-sensitive / high-volume workloads 向けとして位置づけ、`max`までreasoning effortを選択できます。本ハーネスでは実運用上の性能/トークン比から Luna/max を探索系の既定とします。
 - [OpenAI: Custom instructions with AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md): 指示の探索順、現在地に近い指示の優先、既定の32 KiB上限、読込確認方法を反映しています。
 - [OpenAI: Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents): subagentの総トークン増加、主スレッドの文脈分離、読み取り中心の並列化という使い分けを反映しています。
-- [OpenAI Model guidance](https://developers.openai.com/api/docs/guides/latest-model): サブエージェントの委譲条件を明示し、テスト・検証の量を作業に合わせて調整する方針を示しています。資料内の具体例は Astra 向けですが、本ハーネスではユーザー指定どおり Sol/Luna に適用しています。
-- [Anthropic: Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents): 初期化、作業の小分け、構造化した引き継ぎという考え方を採用しています。
-- [Anthropic: Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps): planner/generator/evaluator の分離と、複雑さを必要最小限に保つ考え方を、常時機構ではなく必要時の運用ルールへ落とし込んでいます。
+- [OpenAI Model guidance](https://developers.openai.com/api/docs/guides/latest-model): 委譲条件を明示し、テスト・検証の量を作業に合わせて調整する方針を参照しています。
+
+補助的な設計参考として、長時間エージェントの引き継ぎやplanner/generator/evaluator分離についてAnthropicの公開資料も参照していますが、Codex固有の運用判断はOpenAI一次資料を優先します。
 
 ## 適用範囲
 
