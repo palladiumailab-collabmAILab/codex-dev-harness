@@ -38,6 +38,7 @@
 
 - `repo-research`: 未知のリポジトリ、複雑な依存関係、外部仕様を実装前に調査するとき。
 - `github-operations`: GitHubへの作成・同期・push/pull・Issue・PR等を明示的に依頼されたとき。
+- `code-review`: PR、diff、patch、AI生成コードをレビューするとき、または回帰リスクをテスト駆動で検証するとき。
 - `self-improvement`: agent/workflow を評価付きで反復改善するとき。
 - `long-running-work`: 長時間または複数セッションにまたがる作業を分割・引き継ぐとき。
 - その他の skill は、その frontmatter の適用条件を満たす場合だけ読みます。

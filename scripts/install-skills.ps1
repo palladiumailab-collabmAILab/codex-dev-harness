@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]$CodexSkillsRoot,
-    [string[]]$Name = @('repo-research', 'github-operations', 'self-improvement', 'long-running-work'),
+    [string[]]$Name = @('repo-research', 'github-operations', 'code-review', 'self-improvement', 'long-running-work'),
     [string]$RepositoryRoot = (Split-Path -Parent $PSScriptRoot)
 )
 

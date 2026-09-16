@@ -17,6 +17,7 @@ codex-dev-harness/
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
+│   ├── code-review/
 │   ├── self-improvement/
 │   ├── long-running-work/
 │   └── reverse-engineering/         # 任意導入
@@ -50,7 +51,7 @@ codex-dev-harness/
 
 対象リポジトリへ必要なファイルをコピーします。既存の `AGENTS.md` がある場合は上書きせず、プロジェクト固有ルールを残したまま統合します。
 
-Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
+Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する5 skillだけをコピーします。
 
 ```powershell
 pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
@@ -60,6 +61,7 @@ pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.
 
 - `repo-research`
 - `github-operations`
+- `code-review`
 - `self-improvement`
 - `long-running-work`
 
@@ -113,6 +115,7 @@ Plusで利用可能な GPT-5.6 を前提に、利用枠を重要な判断へ集�
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
+- コードレビューとテスト駆動検証: `skills/code-review/SKILL.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
