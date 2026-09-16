@@ -1,5 +1,7 @@
 # ハーネス品質監査 — 2026-09-12
 
+> Historical record. This audit describes the repository state on 2026-09-12 and is not the current specification or score.
+
 ## 結果
 
 - 初回評価: **78/100**
