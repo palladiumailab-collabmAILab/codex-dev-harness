@@ -9,9 +9,32 @@ The harness separates always-on instructions, conditional task skills, cross-cut
 2. **Task skills — `skills/*/SKILL.md`**
    - detailed procedures loaded only when their trigger conditions apply.
 3. **Cross-cutting contracts — this document / schemas**
-   - execution provenance, evaluation decisions, design source-of-truth, optimization records.
+   - task goals and acceptance, execution provenance, evaluation decisions, design source-of-truth, optimization records.
 4. **Mechanical enforcement — `scripts/`, `tests/`, CI**
    - checks stable invariants without relying on model judgment.
+
+## Task contract
+
+A task is defined by the requested outcome and the acceptance criteria that distinguish success from merely performing work around it.
+
+Before implementation:
+
+- state the requested outcome in one concise form;
+- identify the required acceptance criteria and how each can be validated;
+- if an ambiguity can materially change the implementation or the completion decision, ask the user to clarify it instead of silently choosing a goal;
+- only make an assumption without clarification when the ambiguity cannot materially change the result, and surface the assumption when it matters to review.
+
+Verification evidence is not the same as task progress or task completion. Tests, lint, type checks, builds, inspections, screenshots, measurements, and model-grader results are evidence for a criterion. They imply completion only when they actually establish the requested outcome.
+
+The completion contract therefore requires:
+
+- every required acceptance criterion to have relevant evidence before the task is reported complete;
+- `checks green / objective unmet` to remain incomplete rather than being converted into success;
+- tests, fixtures, golden outputs, graders, thresholds, or acceptance criteria not to be weakened merely to obtain a pass; a legitimate specification correction must be explicit and justified against the requested behavior;
+- repeated verification with no material implementation, artifact, or decision change to count as non-progress; after bounded repetition, change strategy, surface the blocker, or request missing criteria;
+- visual, UI, semantic, or otherwise non-unit-testable outcomes to use artifact-level evidence such as rendered output, reference comparison, domain metrics, or a structured manual check instead of substituting unrelated green tests.
+
+For reviewable work, preserve a concise mapping of `criterion -> implementation/change -> evidence`. The mapping may live in a task record, progress file, PR description, or final report; it should not require duplicating full logs.
 
 ## Execution result
 
@@ -27,7 +50,7 @@ Typical provenance may include:
 - token, time, and cost metadata when available;
 - optional provider session/turn/artifact references.
 
-A workflow must not report `complete` when required evaluation is unresolved or when verified inputs/outputs changed unexpectedly.
+A workflow must not report `complete` when required evaluation is unresolved, when verified inputs/outputs changed unexpectedly, or when the task contract still has an unmet required criterion.
 
 ## Evaluation result
 
@@ -41,6 +64,7 @@ The evaluation contract should capture:
 - critical no-regression metrics/failure classes;
 - sample count and uncertainty where relevant;
 - evaluator type, version, and configuration;
+- task-level criterion identifiers and evidence references when the evaluation is used to decide task completion;
 - `accept`, `reject`, or `unresolved` decision.
 
 Use deterministic checks for exact invariants. Use model/hybrid graders when semantic or trajectory quality would be lost by reducing the criterion to an exact check. A small stochastic score delta is not evidence of improvement by itself.
@@ -79,4 +103,4 @@ Iteration count is not evidence of improvement.
 
 ## Enforcement
 
-Prose defines semantics; stable invariants should move into versioned schemas, validators, fixtures/tests, and CI. `AGENTS.md` should not duplicate those mechanics.
+Prose defines semantics; stable invariants should move into versioned schemas, validators, fixtures/tests, and CI. `AGENTS.md` should not duplicate those mechanics. Task-level criterion/evidence linkage belongs in the same executable contract layer as execution/evaluation records so that local prompt wording cannot redefine completion on its own.
