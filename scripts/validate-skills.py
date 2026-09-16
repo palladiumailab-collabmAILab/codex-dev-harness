@@ -6,7 +6,6 @@ from pathlib import Path
 
 import yaml
 
-
 NAME_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
