@@ -1,6 +1,6 @@
 ---
 name: reverse-engineering
-description: Analyze the observable behavior of an authorized legacy, opaque, binary, or protocol component for compatibility, debugging, or defensive purposes. Do not use for ordinary code reading.
+description: Analyze an authorized opaque, legacy, binary, protocol, or file-format component when compatibility, migration, debugging, testing, or defense requires observable behavior tracing. Do not use for ordinary source-code reading.
 metadata:
   short-description: Trace authorized black-box behavior
 ---
@@ -17,7 +17,7 @@ Do not bypass access controls, licensing, authentication, or encryption; extract
 2. Preserve evidence before changing anything: version, hashes where appropriate, command lines, fixtures, observed outputs, timestamps, and environment assumptions. Redact credentials and personal data.
 3. Observe before inferring. Build a small, reproducible matrix of inputs, outputs, errors, state transitions, timing only when relevant, and side effects. Use the smallest fixture that distinguishes competing hypotheses.
 4. Trace static structure and dynamic behavior independently. Mark each conclusion as `fact`, `strong inference`, or `unknown`; attach a source location, trace, or reproducible experiment to facts.
-5. When parallel work helps, delegate independent read-only lanes such as format/protocol observation and static call-graph tracing. Use Luna for repetitive collection and Sol for synthesis or difficult interpretation. Keep the parent agent responsible for the final model and any edits.
+5. When parallel work helps, delegate independent read-only lanes such as format/protocol observation and static call-graph tracing. Keep the parent agent responsible for the final behavior model and any edits.
 6. Convert important observations into regression fixtures or characterization tests only when the user asks for implementation or the repository's workflow requires them. Do not alter the target merely to make the observation easier.
 
 ## Output

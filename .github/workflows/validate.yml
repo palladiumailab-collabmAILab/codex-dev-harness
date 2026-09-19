@@ -29,8 +29,10 @@ jobs:
           python -m ruff check .
           python -m ruff format --check .
 
-      - name: Validate skills
-        run: python scripts/validate-skills.py skills
+      - name: Validate skills and model profiles
+        run: |
+          python scripts/validate-skills.py skills
+          python scripts/validate-model-profiles.py
 
       - name: Validate repository invariants
         run: |
