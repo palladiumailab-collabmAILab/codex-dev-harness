@@ -1,37 +1,45 @@
 # Codex 開発ハーネス
 
-Codex をソフトウェア開発に使うための再利用可能なハーネスです。共通の最小入口、モデル別 profile、条件付き task skill、project baseline、task prompt、機械的 validation を分離します。
+Codex をソフトウェア開発に使うための再利用可能なハーネスです。共通の最小入口、モデル別 profile、条件付き task skill、共通 contract、project baseline、task prompt、機械的 validation を分離します。
 
 ## 構成
 
 ```text
 codex-dev-harness/
-├── AGENTS.md
+├── AGENTS.md                         # 全モデル共通の最小入口
+├── .github/workflows/validate.yml   # push/PR時の検証
+├── .githooks/pre-commit             # 任意の軽量チェック
+├── pyproject.toml                   # このハーネス自身のRuff設定
 ├── profiles/
-│   ├── astra/AGENTS.md
-│   └── sol-luna/AGENTS.md
+│   ├── astra/AGENTS.md              # GPT-6 Astra固有
+│   └── sol-luna/AGENTS.md           # GPT-5.6 Sol/Luna固有
+├── docs/
+│   ├── model-profiles.md            # モデル分離方針
+│   ├── harness-architecture.md      # 共通contractの意味
+│   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   └── history/                     # 過去の監査・設計記録
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
 │   ├── self-improvement/
 │   ├── long-running-work/
-│   └── reverse-engineering/
-├── templates/
-│   ├── task-prompts/
-│   │   ├── astra.md
-│   │   └── sol-luna.md
-│   ├── codex-progress.md
-│   └── project-specs/README.md
-├── docs/
-│   ├── model-profiles.md
-│   ├── harness-architecture.md
-│   └── project-baseline.md
+│   └── reverse-engineering/         # 任意導入
 ├── scripts/
-│   ├── validate-skills.py
+│   ├── install-githooks.ps1
+│   ├── install-skills.ps1
+│   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
-│   └── validate-harness.ps1
-└── .github/workflows/validate.yml
+│   └── validate-skills.py
+├── tests/
+└── templates/
+    ├── task-prompts/
+    │   ├── astra.md
+    │   └── sol-luna.md
+    ├── codex-progress.md
+    └── project-specs/README.md      # 対象repoの docs/specs/ 用ひな形
 ```
+
+詳細な手順は root `AGENTS.md` に複製せず、対応する model profile と、発火条件に一致した skill / docs だけを参照します。
 
 ## モデル分離
 
@@ -40,7 +48,7 @@ root `AGENTS.md` は共通不変条件と routing だけを持ちます。作業
 - GPT-6 Astra: `profiles/astra/AGENTS.md`
 - GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
 
-Astra profile は、必要な guidance の条件付き読み込み、安全なローカル作業の継続、明示的な Done を重視します。Sol/Luna profile は、従来の明示的な workflow と Sol/Luna routing を保持します。
+Astra profile は、必要な guidance の条件付き読み込み、安全なローカル作業の継続、明示的な Done を重視します。Sol/Luna profile は従来の明示的な workflow と Sol/Luna routing を保持します。
 
 詳細は `docs/model-profiles.md` を参照してください。
 
@@ -57,18 +65,6 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 
 特殊用途の `reverse-engineering` は明示的に選択します。
 
-```powershell
-pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
-```
-
-特定 skill だけ導入する場合:
-
-```powershell
-pwsh ./scripts/install-skills.ps1 `
-  -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills' `
-  -Name repo-research,reverse-engineering
-```
-
 ## Task prompt
 
 モデル別の task prompt を分離しています。
@@ -76,29 +72,64 @@ pwsh ./scripts/install-skills.ps1 `
 - Astra: `templates/task-prompts/astra.md`
 - Sol/Luna: `templates/task-prompts/sol-luna.md`
 
-特に Astra 用 prompt は、Outcome / Scope / Constraints / 必要時だけ読む資料 / Done when を明示し、最初の実装で止まらず必要な検証と修正まで継続する許可を含みます。
+Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料 / Done when を明示し、最初の実装で止まらず必要な検証と修正まで継続する許可を含みます。
 
-## Project baseline
+## プロジェクト基準
 
-共通の project baseline は `docs/project-baseline.md` を正本とします。
+対象リポジトリへ適用する共通基準は `docs/project-baseline.md` を正本とします。主要ルールは次の通りです。
 
-- durable specification は `docs/specs/` または既存の単一正本に集約
-- 実行可能なソフトウェアは Docker で再現可能な経路を持つ
-- GitHub で管理する実行可能なソフトウェアは GitHub Actions を遠隔品質ゲートにする
-- Python は Ruff を lint / format の標準品質ゲートにする
-- framework、DB、service topology、frontend/backend の物理分離はプロジェクト固有
+- 長期に有効な製品・システム仕様は `docs/specs/` に集約し、実装判断より先に関連仕様を参照する。
+- 実行可能なソフトウェアは Docker で再現可能な開発・検証経路を持つ。
+- GitHubで管理する実行可能なソフトウェアでは、GitHub Actions を標準の遠隔品質ゲートとし、PRとdefault branch pushでプロジェクト固有の検証を実行する。
+- Python を含むリポジトリでは、新規・既存を問わず Ruff を lint / format の標準品質ゲートにし、GitHub Actionsでも実行する。
+- テスト、型チェック、build、repository invariant、domain validator 等は適用範囲に応じてCIへ載せ、ローカル成功だけで完了扱いしない。
+- Webアプリの `frontend/` / `backend/` 物理分離、framework、DB、service topology はプロジェクト固有とし、ハーネスから一律強制しない。
+
+`templates/project-specs/README.md` は対象リポジトリの `docs/specs/README.md` として利用できます。既存仕様書がある場合は、上書きせず正本を一つに整理します。
+
+## 導入
+
+対象リポジトリへ必要なファイルをコピーします。既存の `AGENTS.md` がある場合は上書きせず、プロジェクト固有ルールを残したまま統合します。
+
+Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
+
+```powershell
+pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
+```
+
+特定skillだけ、または `reverse-engineering` のような特殊用途skillを導入する場合は明示します。
+
+```powershell
+pwsh ./scripts/install-skills.ps1 `
+  -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills' `
+  -Name repo-research,reverse-engineering
+```
+
+既存の同名skillは上書きしません。
+
+Git hook は任意です。
+
+```powershell
+pwsh ./scripts/install-githooks.ps1
+```
+
+解除:
+
+```powershell
+git config --unset core.hooksPath
+```
 
 ## 検証
 
-Windows:
+Windowsでは次を実行します。
 
 ```powershell
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker 上で Ruff、skill validation、model-profile separation validation を実行します。ホスト依存関係がある場合は `-SkipDocker` も利用できます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、model-profile separation validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
-GitHub Actions でも以下を検証します。
+GitHub Actionsでもpush/PRごとに以下を確認します。
 
 - Ruff lint / format
 - skill frontmatter
@@ -106,10 +137,26 @@ GitHub Actions でも以下を検証します。
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
 
+対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
+
+## モデル既定
+
+- GPT-6 Astra: `profiles/astra/AGENTS.md`
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+
+Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用しません。
+
 ## 参照先
 
 - モデル分離: `docs/model-profiles.md`
-- 共通 contract と評価: `docs/harness-architecture.md`
-- project baseline: `docs/project-baseline.md`
+- 共通contractと評価ゲート: `docs/harness-architecture.md`
+- プロジェクト共通基準: `docs/project-baseline.md`
+- 未知のrepo調査: `skills/repo-research/SKILL.md`
+- GitHub操作: `skills/github-operations/SKILL.md`
+- agent/workflow自己改善: `skills/self-improvement/SKILL.md`
+- 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
+- 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
 - Astra task prompt: `templates/task-prompts/astra.md`
 - Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`
+
+設計方針はOpenAIの公開するHarness Engineering、AGENTS.md、Subagents、モデルガイダンスを一次資料として扱います。
