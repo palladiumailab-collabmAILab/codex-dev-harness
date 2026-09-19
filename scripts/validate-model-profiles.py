@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -9,6 +10,11 @@ REQUIRED = (
     ROOT / "profiles/sol-luna/AGENTS.md",
     ROOT / "templates/task-prompts/astra.md",
     ROOT / "templates/task-prompts/sol-luna.md",
+)
+
+MODEL_NAME_PATTERN = re.compile(
+    r"\b(?:gpt-5\.6(?:-sol|-luna)?|gpt-6(?:[- ]astra)?|sol|luna|astra)\b",
+    re.IGNORECASE,
 )
 
 
@@ -55,10 +61,13 @@ def main() -> int:
             errors.append(f"{path.relative_to(ROOT)} must not contain GPT-6 Astra guidance")
 
     for skill_file in sorted((ROOT / "skills").glob("*/SKILL.md")):
-        text = read(skill_file).lower()
-        if "gpt-5.6-sol" in text or "gpt-5.6-luna" in text or "gpt-6 astra" in text:
+        text = read(skill_file)
+        match = MODEL_NAME_PATTERN.search(text)
+        if match:
             relative = skill_file.relative_to(ROOT)
-            errors.append(f"{relative} must stay model-neutral; move model routing to profiles/")
+            errors.append(
+                f"{relative} must stay model-neutral; found model name {match.group(0)!r}"
+            )
 
     if "## Done" not in read(ROOT / "profiles/astra/AGENTS.md"):
         errors.append("Astra profile must define Done")
