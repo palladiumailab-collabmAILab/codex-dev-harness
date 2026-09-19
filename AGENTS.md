@@ -24,7 +24,7 @@
 
 必要な場面でだけ読みます。
 
-- Docker、GitHub Actions、Python/Ruff、仕様正本の共通基準を変更・導入するとき: `docs/project-baseline.md`
+- 実行可能なソフトウェアの実装・変更・検証で、Docker再現性、GitHub Actions、Python/Ruff、仕様正本の扱いが関係するとき: `docs/project-baseline.md`
 - task contract、評価、自己改善、実行結果の意味を変更するとき: `docs/harness-architecture.md`
 - 長時間作業の引き継ぎが必要なとき: `templates/codex-progress.md`
 - モデル別タスク依頼を組み立てるとき: `templates/task-prompts/`
