@@ -18,6 +18,7 @@ codex-dev-harness/
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── contracts/                    # 実行・評価contractの利用ガイド
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   ├── efficiency/                  # harness効率評価の計画・判定基準
 │   ├── evals/                        # 代表的なrouting/evaluation fixtureの説明
 │   └── history/                     # 過去の監査・設計記録
 ├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
@@ -26,6 +27,7 @@ codex-dev-harness/
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
+│   ├── harness-efficiency-evaluation/ # 条件付きの効率機構評価
 │   ├── code-review/
 │   ├── self-improvement/
 │   ├── long-running-work/
@@ -36,6 +38,7 @@ codex-dev-harness/
 ├── scripts/
 │   ├── harness-provenance.ps1     # manifest / hash / sync primitives
 │   ├── install-githooks.ps1
+│   ├── validate-efficiency-evaluation.py
 │   ├── install-skills.ps1          # first-time install only
 │   ├── sync-skills.ps1             # dry-run and idempotent update
 │   ├── validate-harness-manifest.ps1
@@ -89,6 +92,8 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 
 構造変更用の `architecture-design`、データモデル横断変更用の `schema-first-design`、特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。いずれも日常の小さな修正向けの既定導入には含めません。
 大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
+
+外部のagent-harness効率機構を比較する `harness-efficiency-evaluation` も条件付きで、実測・hold-out・安全性ゲートが必要なときだけ読みます。
 
 ## Task prompt
 
@@ -188,7 +193,7 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、model-profile separation validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、model-profile separation validation、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
 GitHub Actionsでもpush/PRごとに以下を確認します。
 
@@ -201,6 +206,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
+- harness効率評価matrixのfeature flag / hold-out / metric gate
 - provenance-aware skill sync regression transitions
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
@@ -225,6 +231,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - コードレビュー評価ケース: `docs/evals/code-review.md`
 - コードレビュー方法論の出典記録: `docs/history/code-review-methodology.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
+- harness効率機構の比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
+- SoL-Pi評価方針と未導入判断: `docs/efficiency/harness-efficiency-evaluation.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
 - canonical data modelから派生成果物を作る設計: `skills/schema-first-design/SKILL.md`

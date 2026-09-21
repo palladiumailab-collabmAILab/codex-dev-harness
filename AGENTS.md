@@ -38,6 +38,7 @@
 - GitHub remote 操作: `skills/github-operations/SKILL.md`
 - 未知の repo を横断調査: `skills/repo-research/SKILL.md`
 - agent / workflow の評価付き反復改善: `skills/self-improvement/SKILL.md`
+- agent harness の効率機構や外部候補を、baseline・hold-out・安全性ゲート付きで比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
 - API / DB / 型 / 業務フロー / UIを横断する canonical data model と派生成果物の整合性を設計する: `skills/schema-first-design/SKILL.md`
 - 抽象化・pattern・module boundary の比較を、具体的な設計圧力と実行可能な根拠に基づいて行う: `skills/architecture-design/SKILL.md`
 - 大規模または混在した asset tree の機械的な inventory・重複排除・候補絞り込み: `skills/asset-extraction/SKILL.md`

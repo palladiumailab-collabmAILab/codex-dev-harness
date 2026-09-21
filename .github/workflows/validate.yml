@@ -49,6 +49,9 @@ jobs:
       - name: Validate code-review evaluation coverage
         run: python scripts/validate-code-review-evals.py
 
+      - name: Validate harness efficiency evaluation matrix
+        run: python scripts/validate-efficiency-evaluation.py
+
       - name: Validate repository invariants
         run: |
           test "$(wc -c < AGENTS.md)" -le 4096
