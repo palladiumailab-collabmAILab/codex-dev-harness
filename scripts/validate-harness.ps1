@@ -37,9 +37,18 @@ try {
         throw "Tracked pre-commit hook must be executable (100755); found $hookMode."
     }
 
-    $agentsSize = (Get-Item -LiteralPath AGENTS.md).Length
-    if ($agentsSize -gt 32768) {
-        throw "AGENTS.md exceeds the default 32 KiB project instruction limit: $agentsSize bytes."
+    $instructionBudgets = @{
+        'AGENTS.md' = 4096
+        'templates/downstream/AGENTS.md' = 3072
+        'profiles/astra/AGENTS.md' = 2048
+        'profiles/sol-luna/AGENTS.md' = 2048
+    }
+    foreach ($relativePath in $instructionBudgets.Keys) {
+        $size = (Get-Item -LiteralPath $relativePath).Length
+        $budget = $instructionBudgets[$relativePath]
+        if ($size -gt $budget) {
+            throw "$relativePath exceeds the harness instruction budget: $size > $budget bytes."
+        }
     }
 
     if ($SkipDocker) {
@@ -48,12 +57,13 @@ try {
         Invoke-Checked 'skill validation' { python scripts/validate-skills.py skills }
         Invoke-Checked 'skill registration validation' { python scripts/validate-skill-registration.py }
         Invoke-Checked 'code-review evaluation validation' { python scripts/validate-code-review-evals.py }
+        Invoke-Checked 'model profile validation' { python scripts/validate-model-profiles.py }
     }
     else {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --mount $mount -e RUFF_CACHE_DIR=/tmp/ruff-cache python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-skill-registration.py && python scripts/validate-code-review-evals.py'
+            docker run --rm --mount $mount -e RUFF_CACHE_DIR=/tmp/ruff-cache python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-skill-registration.py && python scripts/validate-code-review-evals.py && python scripts/validate-model-profiles.py'
         }
     }
 
