@@ -5,6 +5,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+EVALUATION_SCHEMA_VERSION = 1
+
 
 class Decision(StrEnum):
     ACCEPT = "accept"
@@ -172,6 +174,7 @@ class EvaluationResult:
 
     def to_dict(self) -> dict[str, object]:
         return {
+            "schema_version": EVALUATION_SCHEMA_VERSION,
             "decision": self.decision.value,
             "criteria": [criterion.to_dict() for criterion in self.criteria],
             "raw_metrics": [metric.to_dict() for metric in self.metrics],

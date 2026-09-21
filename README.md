@@ -20,6 +20,7 @@ codex-dev-harness/
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
 │   └── history/                     # 過去の監査・設計記録
 ├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
+├── schemas/                          # versioned execution/evaluation schemas
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/

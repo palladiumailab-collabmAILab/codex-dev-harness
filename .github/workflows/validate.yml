@@ -35,6 +35,11 @@ jobs:
           python scripts/validate-model-profiles.py
           python -m unittest discover -s tests -p 'test_*.py'
 
+      - name: Validate contract fixtures
+        run: |
+          python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid
+          python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid
+
       - name: Validate repository invariants
         run: |
           test "$(wc -c < AGENTS.md)" -le 4096
