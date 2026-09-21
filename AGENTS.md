@@ -43,6 +43,7 @@
 - `github-operations`: GitHub の branch / commit / push / pull / Issue / PR / CI 確認 / remote file mutation を明示的に依頼されたとき。ローカルだけの編集では使わない。
 - `self-improvement`: 既存の agent / prompt / tool / workflow を、baseline と評価基準に対して候補比較しながら反復改善するとき。一回限りの書き換えでは使わない。
 - `harness-efficiency-evaluation`: agent harness の効率機構や外部候補を、baseline・hold-out・安全性ゲート付きで比較評価するとき。token削減だけの一回限りの最適化には使わない。
+- `computer-use-backend-evaluation`: Computer Use の decision backend を baseline と比較し、fallback・safety・latency・verification を評価するとき。GUI操作の無監督実行には使わない。
 - `long-running-work`: 1回の通常実装パスでは完了できず、複数の大きな段階またはセッション間 handoff が必要なとき。単に手順が複数あるだけでは使わない。
 - `reverse-engineering`: 許可された opaque / legacy / binary / protocol component の観測可能な挙動を、互換性・移行・診断・防御目的で調べるとき。通常のコード読解では使わない。
 

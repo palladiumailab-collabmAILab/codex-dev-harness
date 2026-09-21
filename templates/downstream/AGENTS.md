@@ -24,6 +24,7 @@ Read only when relevant:
 - unfamiliar cross-module repository investigation: `skills/repo-research/SKILL.md`
 - iterative agent/workflow optimization: `skills/self-improvement/SKILL.md`
 - harness-efficiency mechanism comparison with baseline/hold-out and safety gates: `skills/harness-efficiency-evaluation/SKILL.md`
+- Computer Use decision-backend comparison with fallback, safety, and verification gates: `skills/computer-use-backend-evaluation/SKILL.md`
 - work spanning multiple substantial stages/sessions: `skills/long-running-work/SKILL.md`
 
 ## Model routing

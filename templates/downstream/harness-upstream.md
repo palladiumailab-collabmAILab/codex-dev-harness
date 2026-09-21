@@ -25,7 +25,9 @@ When a shared rule needs to change:
 - `skills/github-operations/SKILL.md`
 - `skills/self-improvement/SKILL.md`
 - `skills/harness-efficiency-evaluation/SKILL.md`
+- `skills/computer-use-backend-evaluation/SKILL.md`
 - `skills/long-running-work/SKILL.md`
 - `docs/efficiency/harness-efficiency-evaluation.md`
+- `docs/efficiency/jev-cu-evaluation.md`
 - `templates/codex-progress.md`
 - `templates/project-specs/README.md`

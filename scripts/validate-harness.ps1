@@ -48,12 +48,13 @@ try {
         Invoke-Checked 'skill validation' { python scripts/validate-skills.py skills }
         Invoke-Checked 'model profile validation' { python scripts/validate-model-profiles.py }
         Invoke-Checked 'harness efficiency evaluation validation' { python scripts/validate-efficiency-evaluation.py }
+        Invoke-Checked 'Computer Use backend evaluation validation' { python scripts/validate-computer-use-backend-evaluation.py }
     }
     else {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --env RUFF_CACHE_DIR=/tmp/ruff-cache --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python scripts/validate-efficiency-evaluation.py'
+            docker run --rm --env RUFF_CACHE_DIR=/tmp/ruff-cache --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python scripts/validate-efficiency-evaluation.py && python scripts/validate-computer-use-backend-evaluation.py'
         }
     }
 
