@@ -16,8 +16,11 @@ codex-dev-harness/
 ├── docs/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
+│   ├── contracts/                    # 実行・評価contractの利用ガイド
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
 │   └── history/                     # 過去の監査・設計記録
+├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
+├── schemas/                          # versioned execution/evaluation schemas
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
@@ -26,12 +29,18 @@ codex-dev-harness/
 │   ├── reverse-engineering/         # 任意導入
 │   └── asset-extraction/            # 大規模asset tree向け、任意導入
 ├── scripts/
+│   ├── harness-provenance.ps1     # manifest / hash / sync primitives
 │   ├── install-githooks.ps1
-│   ├── install-skills.ps1
+│   ├── install-skills.ps1          # first-time install only
+│   ├── sync-skills.ps1             # dry-run and idempotent update
+│   ├── validate-harness-manifest.ps1
 │   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
+│   ├── validate-contracts.py
 │   └── validate-skills.py
 ├── tests/
+│   ├── test-harness-sync.ps1
+│   └── test-pre-commit.sh
 └── templates/
     ├── task-prompts/
     │   ├── astra.md
@@ -99,6 +108,7 @@ Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料
 
 新規導入では `templates/downstream/AGENTS.md` を root `AGENTS.md` として使い、プロジェクト固有規則は `AGENTS.project.md` へ分離します。同期元 revision と managed file set は `docs/harness-upstream.md` に記録します。既存の project-specific `AGENTS.md` がある場合は、その固有部分を `AGENTS.project.md` 等へ移し、共通部分と混在させないでください。
 
+対象リポジトリへ必要なSkillをコピーします。既存の共通 `AGENTS.md` は上書きせず、プロジェクト固有ルールは `AGENTS.project.md` に分離します。Skillの導入先を対象リポジトリ内（例: `.codex/skills`）に置き、`harness.lock.json` をコミットすると、導入元commitと管理対象ファイルのhashをCIで監査できます。
 
 Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
 
@@ -115,6 +125,38 @@ pwsh ./scripts/install-skills.ps1 `
 ```
 
 既存の同名skillは上書きしません。
+
+初回導入後の更新は `install-skills.ps1` ではなく `sync-skills.ps1` を使います。`install` は既存のSkillディレクトリやmanifestを上書きしないため、誤った再導入でローカル変更を壊しません。
+
+```powershell
+pwsh ./scripts/install-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+
+pwsh ./scripts/sync-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json' `
+  -DryRun
+
+pwsh ./scripts/sync-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+```
+
+Dry-runは `add` / `update` / `unchanged` / `remove` / `conflict` を表示します。manifestに記録したhashと異なるローカル変更は `conflict` として終了コード2で報告し、更新を一切適用しません。管理対象外のファイルはコピー・削除しないため、下流リポジトリ固有のファイルは保持されます。
+
+導入先のCIではmanifest driftを次のように検査できます。
+
+```powershell
+pwsh ./path/to/codex-dev-harness/scripts/validate-harness-manifest.ps1 `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+```
+
+競合から復旧する場合は、ローカル変更をレビューして別名へ退避した後、manifest記載の旧内容へ戻すか、意図したローカル変更を新しい導入元へ取り込んでから再度 `sync-skills.ps1 -DryRun` を実行します。rollbackは、別のharness checkoutを対象commitに切り替えて同じdry-run/sync手順を使います。いずれもforce pushや無条件上書きは必要ありません。
 
 Git hook は任意です。
 
@@ -143,8 +185,10 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
+- provenance-aware skill sync regression transitions
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
@@ -159,6 +203,7 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 
 - モデル分離: `docs/model-profiles.md`
 - 共通contractと評価ゲート: `docs/harness-architecture.md`
+- 実行・評価contract: `docs/contracts/execution.md`, `docs/contracts/evaluation.md`
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`

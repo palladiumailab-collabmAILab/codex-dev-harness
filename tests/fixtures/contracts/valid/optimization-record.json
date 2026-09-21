@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "candidate_id": "candidate-001",
+  "parent_candidate_id": null,
+  "baseline_id": "baseline-001",
+  "change": {
+    "summary": "Use bounded observation packing",
+    "scope": ["harness_contracts", "docs/contracts"],
+    "diff_ref": "commit:abc123"
+  },
+  "data": {
+    "optimization_version": "tasks-v1",
+    "holdout_version": "tasks-holdout-v1"
+  },
+  "evaluation": {
+    "decision": "accept",
+    "reference": "artifacts/evaluation-result.json"
+  },
+  "acceptance": {
+    "decision": "accepted",
+    "reason": "All required criteria met on the holdout set."
+  },
+  "provenance": {
+    "harness_version": "90bcc9b",
+    "evaluator": "deterministic-gate-v1",
+    "experiment_id": "exp-001",
+    "provider_refs": {"run_id": "run-001"}
+  }
+}
