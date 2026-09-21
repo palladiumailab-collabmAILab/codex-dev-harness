@@ -43,6 +43,12 @@ jobs:
           python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid
           python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid
 
+      - name: Validate skill registration
+        run: python scripts/validate-skill-registration.py
+
+      - name: Validate code-review evaluation coverage
+        run: python scripts/validate-code-review-evals.py
+
       - name: Validate repository invariants
         run: |
           test "$(wc -c < AGENTS.md)" -le 4096

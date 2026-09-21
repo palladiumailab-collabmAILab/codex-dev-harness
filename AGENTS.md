@@ -27,6 +27,11 @@
 
 ## 必要時だけ読む
 
+- `repo-research`: 未知のリポジトリ、複雑な依存関係、外部仕様を実装前に調査するとき。
+- `github-operations`: GitHubへの作成・同期・push/pull・Issue・PR等を明示的に依頼されたとき。
+- `code-review`: PR、diff、patch、commit、AI生成コードをレビューするとき、またはレビュー／レビュー中心の回帰分析を明示的に依頼されたとき。通常の実装・修正には使わない。
+- `self-improvement`: agent/workflow を評価付きで反復改善するとき。
+- `long-running-work`: 長時間または複数セッションにまたがる作業を分割・引き継ぐとき。
 - Docker / GitHub Actions / Python-Ruff / 共通仕様配置: `docs/project-baseline.md`
 - task contract / evaluation / optimization semantics: `docs/harness-architecture.md`
 - セッション間 handoff: `templates/codex-progress.md`

@@ -26,6 +26,7 @@ codex-dev-harness/
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
+│   ├── code-review/
 │   ├── self-improvement/
 │   ├── long-running-work/
 │   ├── reverse-engineering/         # 任意導入
@@ -39,6 +40,8 @@ codex-dev-harness/
 │   ├── sync-skills.ps1             # dry-run and idempotent update
 │   ├── validate-harness-manifest.ps1
 │   ├── validate-harness.ps1
+│   ├── validate-code-review-evals.py
+│   ├── validate-skill-registration.py
 │   ├── validate-model-profiles.py
 │   ├── validate-architecture-evals.py
 │   ├── validate-contracts.py
@@ -80,6 +83,7 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 
 - `repo-research`
 - `github-operations`
+- `code-review`
 - `self-improvement`
 - `long-running-work`
 
@@ -116,7 +120,7 @@ Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料
 
 対象リポジトリへ必要なSkillをコピーします。既存の共通 `AGENTS.md` は上書きせず、プロジェクト固有ルールは `AGENTS.project.md` に分離します。Skillの導入先を対象リポジトリ内（例: `.codex/skills`）に置き、`harness.lock.json` をコミットすると、導入元commitと管理対象ファイルのhashをCIで監査できます。
 
-Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
+Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する5 skillだけをコピーします。
 
 ```powershell
 pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
@@ -184,7 +188,7 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、model-profile separation validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、model-profile separation validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
 GitHub Actionsでもpush/PRごとに以下を確認します。
 
@@ -217,6 +221,9 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
+- コードレビューとレビュー中心の回帰検証: `skills/code-review/SKILL.md`
+- コードレビュー評価ケース: `docs/evals/code-review.md`
+- コードレビュー方法論の出典記録: `docs/history/code-review-methodology.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
