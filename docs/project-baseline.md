@@ -4,6 +4,20 @@ This document defines the reusable project-level defaults that sit between the g
 
 The baseline is intentionally small. It standardizes reproducibility, GitHub CI, Python quality gates, and the location of durable specifications without forcing one Web framework, repository layout, database, or service topology.
 
+## Upstream-managed harness
+
+The reusable harness is owned by `palladiumailab-collabmAILab/codex-dev-harness`. A downstream repository may add project-specific instructions, specifications, skills, validation commands, and architecture rules, but it must not independently rewrite copied common harness content.
+
+For downstream repositories:
+
+- record the pinned upstream revision and managed file set in `docs/harness-upstream.md`;
+- keep shared `AGENTS.md`, shared baseline/architecture docs, generic skills, and shared templates synchronized from the upstream revision;
+- put repository-specific instructions in `AGENTS.project.md` or other clearly project-specific files;
+- when a common rule needs to change, change and validate it upstream first, then sync the downstream copy;
+- do not weaken or fork common rules under the label of a project-specific change unless the rule is genuinely project-specific.
+
+This ownership rule prevents shared harness behavior from drifting independently across repositories.
+
 ## Canonical specifications
 
 When a project has durable product or system requirements, keep the current specification set under `docs/specs/`.

@@ -41,6 +41,10 @@ codex-dev-harness/
     │   ├── astra.md
     │   └── sol-luna.md
     ├── codex-progress.md
+    ├── downstream/
+    │   ├── AGENTS.md                # 下流向け共通入口（upstream-managed）
+    │   ├── AGENTS.project.md        # プロジェクト固有規則の分離先
+    │   └── harness-upstream.md      # 同期元revision/managed files記録
     └── project-specs/README.md      # 対象repoの docs/specs/ 用ひな形
 ```
 
@@ -94,7 +98,11 @@ Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料
 
 ## 導入
 
-対象リポジトリへ必要なファイルをコピーします。既存の `AGENTS.md` がある場合は上書きせず、プロジェクト固有ルールを残したまま統合します。Skillの導入先を対象リポジトリ内（例: `.codex/skills`）に置き、`harness.lock.json` をコミットすると、導入元commitと管理対象ファイルのhashをCIで監査できます。
+共通ハーネスの正本はこのリポジトリです。対象リポジトリへコピーした共通部分は upstream-managed とし、下流側では直接改変しません。共通規則の変更はこのリポジトリで行い、検証済み revision から同期します。
+
+新規導入では `templates/downstream/AGENTS.md` を root `AGENTS.md` として使い、プロジェクト固有規則は `AGENTS.project.md` へ分離します。同期元 revision と managed file set は `docs/harness-upstream.md` に記録します。既存の project-specific `AGENTS.md` がある場合は、その固有部分を `AGENTS.project.md` 等へ移し、共通部分と混在させないでください。
+
+対象リポジトリへ必要なSkillをコピーします。既存の共通 `AGENTS.md` は上書きせず、プロジェクト固有ルールは `AGENTS.project.md` に分離します。Skillの導入先を対象リポジトリ内（例: `.codex/skills`）に置き、`harness.lock.json` をコミットすると、導入元commitと管理対象ファイルのhashをCIで監査できます。
 
 Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
 
