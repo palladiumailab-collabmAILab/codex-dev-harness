@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "description": "Representative review prompts for deterministic coverage checks, not a model-behavior benchmark.",
+  "cases": [
+    {
+      "id": "correctness-defect",
+      "prompt": "A patch returns a successful response before the transaction commits, so a later commit failure is reported as success. Review the change.",
+      "review_focus": "correctness",
+      "expected_outcome": "finding",
+      "must_not": ["formatter-only comment", "unrelated redesign"]
+    },
+    {
+      "id": "formatter-only-change",
+      "prompt": "A pull request only changes whitespace and formatter output, and the formatter check is green. Review the change.",
+      "review_focus": "tooling",
+      "expected_outcome": "no-material-finding",
+      "must_not": ["duplicate formatter diagnostics", "human finding without behavior impact"]
+    },
+    {
+      "id": "unsupported-future-concern",
+      "prompt": "A patch meets the stated requirement. A reviewer wonders whether a hypothetical future tenant model might need a different abstraction, but no such path exists today.",
+      "review_focus": "speculative",
+      "expected_outcome": "no-material-finding",
+      "must_not": ["speculative finding", "mandatory redesign"]
+    },
+    {
+      "id": "large-redesign-not-required",
+      "prompt": "A small local behavior change is correct and covered. The reviewer proposes replacing the module with a new event-driven architecture without a requirement or execution path.",
+      "review_focus": "redesign",
+      "expected_outcome": "no-material-finding",
+      "must_not": ["broad redesign request", "unrelated refactor requirement"]
+    },
+    {
+      "id": "missing-regression-test",
+      "prompt": "A bug fix changes authorization behavior, but the pull request has no reproducible regression test or equivalent verification for the rejected-user case.",
+      "review_focus": "regression",
+      "expected_outcome": "verification-gap",
+      "must_not": ["claim of complete confidence", "implementation edit during review"]
+    },
+    {
+      "id": "clean-change",
+      "prompt": "The patch matches the acceptance criteria, preserves the boundary conditions, and has proportionate passing tests. Review the change.",
+      "review_focus": "clean",
+      "expected_outcome": "no-material-finding",
+      "must_not": ["invented finding", "comment-volume goal"]
+    }
+  ]
+}

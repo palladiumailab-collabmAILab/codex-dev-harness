@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/palladiumailab-collabmAILab/codex-dev-harness/schemas/optimization-record.schema.json",
+  "title": "Harness optimization candidate record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "candidate_id", "parent_candidate_id", "baseline_id", "change", "data", "evaluation", "acceptance", "provenance"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "candidate_id": { "type": "string", "minLength": 1 },
+    "parent_candidate_id": { "type": ["string", "null"] },
+    "baseline_id": { "type": "string", "minLength": 1 },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "scope", "diff_ref"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "scope": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "diff_ref": { "type": ["string", "null"] }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["optimization_version", "holdout_version"],
+      "properties": {
+        "optimization_version": { "type": "string", "minLength": 1 },
+        "holdout_version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "description": "An evaluation-result record or a content-addressed reference to one.",
+      "required": ["decision", "reference"],
+      "properties": {
+        "decision": { "enum": ["accept", "reject", "unresolved"] },
+        "reference": { "type": "string", "minLength": 1 }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reason"],
+      "properties": {
+        "decision": { "enum": ["accepted", "rejected", "unresolved"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["harness_version", "evaluator", "experiment_id"],
+      "properties": {
+        "harness_version": { "type": "string", "minLength": 1 },
+        "evaluator": { "type": "string", "minLength": 1 },
+        "experiment_id": { "type": "string", "minLength": 1 },
+        "provider_refs": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}
