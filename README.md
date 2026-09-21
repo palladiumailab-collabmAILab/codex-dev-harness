@@ -16,8 +16,10 @@ codex-dev-harness/
 ├── docs/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
+│   ├── contracts/                    # 実行・評価contractの利用ガイド
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
 │   └── history/                     # 過去の監査・設計記録
+├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/

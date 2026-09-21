@@ -33,6 +33,7 @@ jobs:
         run: |
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
+          python -m unittest discover -s tests -p 'test_*.py'
 
       - name: Validate repository invariants
         run: |
