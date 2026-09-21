@@ -22,7 +22,7 @@
 作業開始時に実行モデルに対応する profile を **1つだけ** 読む。
 
 - GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; GPT-6 Astra is optional and not a prerequisite)
 - その他: この共通入口のみ。別モデルの profile を推測で流用しない。
 
 ## 必要時だけ読む
