@@ -47,6 +47,7 @@ try {
         Invoke-Checked 'Ruff format check' { python -m ruff format --check . }
         Invoke-Checked 'skill validation' { python scripts/validate-skills.py skills }
         Invoke-Checked 'model profile validation' { python scripts/validate-model-profiles.py }
+        Invoke-Checked 'contract unit tests' { python -m unittest discover -s tests -p 'test_*.py' }
         Invoke-Checked 'contract fixture validation' {
             python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid
             python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid
@@ -56,7 +57,7 @@ try {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid'
+            docker run --rm --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python -m unittest discover -s tests -p "test_*.py" && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid'
         }
     }
 

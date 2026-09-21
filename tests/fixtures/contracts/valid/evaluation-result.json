@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "objective": {
+    "requested_outcome": "publish a verified artifact",
+    "acceptance_criteria": ["artifact-integrity"],
+    "ambiguous": false,
+    "clarification_requested": false,
+    "assumptions": []
+  },
   "decision": "accept",
   "criteria": [
     {
@@ -30,6 +37,24 @@
     "reasons": []
   },
   "evaluator": "deterministic-gate-v1",
+  "progress": {
+    "material_change": true,
+    "validation_only": false,
+    "non_progress_count": 0,
+    "convergence_action": "continue"
+  },
+  "evaluator_integrity": {
+    "evaluator_modified": false,
+    "spec_correction": false,
+    "justification": null
+  },
+  "traceability": [
+    {
+      "criterion_id": "artifact-integrity",
+      "changes": ["artifact generation"],
+      "evidence": ["run-001/published/result.json#sha256"]
+    }
+  ],
   "provenance": {
     "harness_version": "90bcc9b",
     "dataset_version": "fixture-v1"

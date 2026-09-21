@@ -47,6 +47,8 @@ The completion contract therefore requires:
 
 For reviewable work, preserve a concise mapping of `criterion -> implementation/change -> evidence`. The mapping may live in a task record, progress file, PR description, or final report; it should not require duplicating full logs.
 
+The executable evaluation contract represents this boundary explicitly with `objective`, `progress`, `evaluator_integrity`, and `traceability` fields. A validation-only iteration is evidence, not material progress; repeated non-progress must trigger a strategy change, blocker report, or criteria clarification. An accepted record must not hide an ambiguous objective, missing criterion evidence, incomplete traceability, or an unjustified evaluator/spec change.
+
 ## Execution result
 
 A long-running or multi-stage workflow should distinguish `complete`, `partial`, and `failed`, and retain enough input/output identity and provenance to reproduce or audit the result.

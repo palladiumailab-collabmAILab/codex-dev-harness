@@ -7,14 +7,19 @@ import unittest
 from pathlib import Path
 
 from harness_contracts import (
+    ConvergenceAction,
     CriterionResult,
     CriterionStatus,
     Decision,
     EvaluationResult,
+    EvaluatorIntegrity,
     MetricObservation,
+    ProgressRecord,
     Provenance,
     StageOutcome,
     StageResult,
+    TaskObjective,
+    TraceabilityRecord,
     capture_input,
     create_run_root,
     describe_artifact,
@@ -119,6 +124,7 @@ class HarnessContractTests(unittest.TestCase):
 
     def test_evaluation_accepts_only_evidenced_non_tied_results(self) -> None:
         result = EvaluationResult.decide(
+            objective=TaskObjective("publish the verified artifact", ("artifact-integrity",)),
             criteria=(
                 CriterionResult(
                     "artifact-integrity",
@@ -136,16 +142,32 @@ class HarnessContractTests(unittest.TestCase):
                     min_improvement=1.0,
                 ),
             ),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(
+                TraceabilityRecord(
+                    "artifact-integrity",
+                    ("artifact generation",),
+                    ("run/result.json#sha256",),
+                ),
+            ),
             confidence=0.95,
             tied=False,
             evaluator="deterministic-test-v1",
         )
         self.assertEqual(result.decision, Decision.ACCEPT)
-        self.assertEqual(result.to_dict()["decision"], "accept")
+        record = result.to_dict()
+        self.assertEqual(record["decision"], "accept")
+        self.assertEqual(record["objective"]["requested_outcome"], "publish the verified artifact")
+        self.assertIn("traceability", record)
 
     def test_evaluation_refuses_missing_evidence_ties_and_low_confidence(self) -> None:
         missing_evidence = EvaluationResult.decide(
+            objective=TaskObjective("meet the required criterion", ("required",)),
             criteria=(CriterionResult("required", True, CriterionStatus.MET),),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(TraceabilityRecord("required", ("implementation",), ("test",)),),
             confidence=1.0,
             tied=False,
             evaluator="test",
@@ -153,7 +175,11 @@ class HarnessContractTests(unittest.TestCase):
         self.assertEqual(missing_evidence.decision, Decision.UNRESOLVED)
 
         tied = EvaluationResult.decide(
+            objective=TaskObjective("meet the required criterion", ("required",)),
             criteria=(CriterionResult("required", True, CriterionStatus.MET, ("test",)),),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(TraceabilityRecord("required", ("implementation",), ("test",)),),
             confidence=0.99,
             tied=True,
             evaluator="test",
@@ -161,7 +187,11 @@ class HarnessContractTests(unittest.TestCase):
         self.assertEqual(tied.decision, Decision.UNRESOLVED)
 
         low_confidence = EvaluationResult.decide(
+            objective=TaskObjective("meet the required criterion", ("required",)),
             criteria=(CriterionResult("required", True, CriterionStatus.MET, ("test",)),),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(TraceabilityRecord("required", ("implementation",), ("test",)),),
             confidence=0.5,
             tied=False,
             evaluator="test",
@@ -170,6 +200,7 @@ class HarnessContractTests(unittest.TestCase):
 
     def test_evaluation_rejects_required_regression_and_unmet_criterion(self) -> None:
         result = EvaluationResult.decide(
+            objective=TaskObjective("meet the user goal", ("user-goal",)),
             criteria=(CriterionResult("user-goal", True, CriterionStatus.UNMET, ("test",)),),
             metrics=(
                 MetricObservation(
@@ -181,6 +212,42 @@ class HarnessContractTests(unittest.TestCase):
                     critical=True,
                 ),
             ),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(TraceabilityRecord("user-goal", ("implementation",), ("test",)),),
+            confidence=1.0,
+            tied=False,
+            evaluator="test",
+        )
+        self.assertEqual(result.decision, Decision.REJECT)
+
+    def test_completion_contract_records_ambiguity_and_non_progress(self) -> None:
+        result = EvaluationResult.decide(
+            objective=TaskObjective(
+                "produce a high-quality result",
+                ("user-goal",),
+                ambiguous=True,
+                clarification_requested=True,
+            ),
+            criteria=(CriterionResult("user-goal", True, CriterionStatus.MET, ("test",)),),
+            progress=ProgressRecord(False, True, 3, ConvergenceAction.ASK_FOR_CRITERIA),
+            evaluator_integrity=EvaluatorIntegrity(False, False),
+            traceability=(TraceabilityRecord("user-goal", ("no material change",), ("test",)),),
+            confidence=1.0,
+            tied=False,
+            evaluator="test",
+        )
+        self.assertEqual(result.decision, Decision.UNRESOLVED)
+        self.assertIn("objective clarification requested", result.reasons)
+        self.assertIn("convergence guard", " ".join(result.reasons))
+
+    def test_unauthorized_evaluator_change_rejects_completion(self) -> None:
+        result = EvaluationResult.decide(
+            objective=TaskObjective("meet the user goal", ("user-goal",)),
+            criteria=(CriterionResult("user-goal", True, CriterionStatus.MET, ("test",)),),
+            progress=ProgressRecord(True, False, 0, ConvergenceAction.CONTINUE),
+            evaluator_integrity=EvaluatorIntegrity(True, False, "weakened the test"),
+            traceability=(TraceabilityRecord("user-goal", ("implementation",), ("test",)),),
             confidence=1.0,
             tied=False,
             evaluator="test",

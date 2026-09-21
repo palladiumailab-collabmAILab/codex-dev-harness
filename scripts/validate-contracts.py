@@ -15,6 +15,7 @@ CONTRACT_SCHEMAS = {
     "evaluation": "evaluation-result.schema.json",
     "optimization": "optimization-record.schema.json",
 }
+CONVERGENCE_ACTIONS = {"continue", "change-strategy", "surface-blocker", "ask-for-criteria"}
 
 
 def _is_int(value: object) -> bool:
@@ -241,11 +242,15 @@ def _evaluation(record: object) -> list[str]:
         record,
         (
             "schema_version",
+            "objective",
             "decision",
             "criteria",
             "raw_metrics",
             "acceptance",
             "evaluator",
+            "progress",
+            "evaluator_integrity",
+            "traceability",
             "provenance",
         ),
         location,
@@ -260,6 +265,124 @@ def _evaluation(record: object) -> list[str]:
     errors.extend(_string(record["evaluator"], f"{location}.evaluator"))
     if not isinstance(record["provenance"], dict):
         errors.append(f"{location}.provenance: expected an object")
+
+    objective = record["objective"]
+    objective_criteria: set[str] = set()
+    objective_errors = _required(
+        objective,
+        (
+            "requested_outcome",
+            "acceptance_criteria",
+            "ambiguous",
+            "clarification_requested",
+            "assumptions",
+        ),
+        f"{location}.objective",
+    )
+    errors.extend(objective_errors)
+    if not objective_errors and isinstance(objective, dict):
+        errors.extend(
+            _string(objective["requested_outcome"], f"{location}.objective.requested_outcome")
+        )
+        acceptance_criteria = objective["acceptance_criteria"]
+        if not isinstance(acceptance_criteria, list) or not acceptance_criteria:
+            errors.append(f"{location}.objective.acceptance_criteria: expected a non-empty array")
+        else:
+            for index, criterion_id in enumerate(acceptance_criteria):
+                errors.extend(
+                    _string(criterion_id, f"{location}.objective.acceptance_criteria[{index}]")
+                )
+                if isinstance(criterion_id, str):
+                    if criterion_id in objective_criteria:
+                        errors.append(
+                            f"{location}.objective.acceptance_criteria: duplicate criterion ID"
+                        )
+                    objective_criteria.add(criterion_id)
+        errors.extend(_boolean(objective["ambiguous"], f"{location}.objective.ambiguous"))
+        errors.extend(
+            _boolean(
+                objective["clarification_requested"],
+                f"{location}.objective.clarification_requested",
+            )
+        )
+        if objective["clarification_requested"] and not objective["ambiguous"]:
+            errors.append(
+                f"{location}.objective.clarification_requested requires an ambiguous objective"
+            )
+        assumptions = objective["assumptions"]
+        if not isinstance(assumptions, list) or any(
+            not isinstance(value, str) or not value.strip() for value in assumptions
+        ):
+            errors.append(f"{location}.objective.assumptions: expected an array of strings")
+
+    progress = record["progress"]
+    progress_errors = _required(
+        progress,
+        ("material_change", "validation_only", "non_progress_count", "convergence_action"),
+        f"{location}.progress",
+    )
+    errors.extend(progress_errors)
+    if not progress_errors and isinstance(progress, dict):
+        errors.extend(_boolean(progress["material_change"], f"{location}.progress.material_change"))
+        errors.extend(_boolean(progress["validation_only"], f"{location}.progress.validation_only"))
+        errors.extend(
+            _non_negative_int(
+                progress["non_progress_count"], f"{location}.progress.non_progress_count"
+            )
+        )
+        if progress["validation_only"] and progress["material_change"]:
+            errors.append(
+                f"{location}.progress: validation-only iteration cannot claim material change"
+            )
+        if progress["convergence_action"] not in CONVERGENCE_ACTIONS:
+            errors.append(f"{location}.progress.convergence_action: invalid action")
+        if (
+            isinstance(objective, dict)
+            and objective.get("ambiguous")
+            and objective.get("clarification_requested")
+            and progress["convergence_action"] != "ask-for-criteria"
+        ):
+            errors.append(
+                f"{location}.progress: ambiguous objective requires ask-for-criteria action"
+            )
+        if (
+            _is_int(progress["non_progress_count"])
+            and progress["non_progress_count"] >= 3
+            and progress["convergence_action"] == "continue"
+        ):
+            errors.append(
+                f"{location}.progress: repeated non-progress requires a convergence action"
+            )
+
+    integrity = record["evaluator_integrity"]
+    integrity_errors = _required(
+        integrity,
+        ("evaluator_modified", "spec_correction", "justification"),
+        f"{location}.evaluator_integrity",
+    )
+    errors.extend(integrity_errors)
+    if not integrity_errors and isinstance(integrity, dict):
+        errors.extend(
+            _boolean(
+                integrity["evaluator_modified"],
+                f"{location}.evaluator_integrity.evaluator_modified",
+            )
+        )
+        errors.extend(
+            _boolean(
+                integrity["spec_correction"],
+                f"{location}.evaluator_integrity.spec_correction",
+            )
+        )
+        justification = integrity["justification"]
+        if justification is not None:
+            errors.extend(_string(justification, f"{location}.evaluator_integrity.justification"))
+        if (integrity["evaluator_modified"] or integrity["spec_correction"]) and not (
+            isinstance(justification, str) and justification.strip()
+        ):
+            errors.append(
+                f"{location}.evaluator_integrity: changes require an explicit justification"
+            )
 
     criteria = record["criteria"]
     required_criteria: list[dict[str, Any]] = []
@@ -294,6 +417,55 @@ def _evaluation(record: object) -> list[str]:
                 errors.extend(_string(criterion["note"], f"{item_location}.note"))
             if criterion["required"]:
                 required_criteria.append(criterion)
+
+    criterion_id_set = (
+        {
+            criterion["criterion_id"]
+            for criterion in criteria
+            if isinstance(criterion, dict) and "criterion_id" in criterion
+        }
+        if isinstance(criteria, list)
+        else set()
+    )
+    traceability = record["traceability"]
+    traceability_by_id: dict[str, dict[str, Any]] = {}
+    if not isinstance(traceability, list):
+        errors.append(f"{location}.traceability: expected an array")
+    else:
+        for index, item in enumerate(traceability):
+            item_location = f"{location}.traceability[{index}]"
+            item_errors = _required(item, ("criterion_id", "changes", "evidence"), item_location)
+            errors.extend(item_errors)
+            if item_errors or not isinstance(item, dict):
+                continue
+            criterion_id = item["criterion_id"]
+            errors.extend(_string(criterion_id, f"{item_location}.criterion_id"))
+            if criterion_id in traceability_by_id:
+                errors.append(f"{item_location}.criterion_id: duplicate criterion ID")
+            traceability_by_id[criterion_id] = item
+            if criterion_id not in criterion_id_set:
+                errors.append(f"{item_location}.criterion_id: unknown criterion ID")
+            for field in ("changes", "evidence"):
+                values = item[field]
+                if not isinstance(values, list) or any(
+                    not isinstance(value, str) or not value.strip() for value in values
+                ):
+                    errors.append(f"{item_location}.{field}: expected non-empty string references")
+
+    for criterion in required_criteria:
+        criterion_id = criterion["criterion_id"]
+        trace = traceability_by_id.get(criterion_id)
+        if trace is None:
+            errors.append(
+                f"{location}: required criterion lacks change/evidence traceability: {criterion_id}"
+            )
+        elif not trace["changes"] or not trace["evidence"]:
+            errors.append(f"{location}: criterion traceability is incomplete: {criterion_id}")
+    required_ids = {criterion["criterion_id"] for criterion in required_criteria}
+    for criterion_id in sorted(required_ids - objective_criteria):
+        errors.append(f"{location}.objective: required criterion is not listed: {criterion_id}")
+    for criterion_id in sorted(objective_criteria - criterion_id_set):
+        errors.append(f"{location}.objective: acceptance criterion is unknown: {criterion_id}")
 
     metrics = record["raw_metrics"]
     if not isinstance(metrics, list):
@@ -379,6 +551,16 @@ def _evaluation(record: object) -> list[str]:
             errors.append(f"{location}.acceptance.reasons: expected an array of non-empty strings")
 
         if decision == "accept":
+            if isinstance(objective, dict) and objective.get("ambiguous"):
+                errors.append(f"{location}: accept is invalid while objective is ambiguous")
+            if isinstance(progress, dict) and progress.get("non_progress_count", 0) >= 3:
+                errors.append(f"{location}: accept is invalid after repeated non-progress")
+            if (
+                isinstance(integrity, dict)
+                and integrity.get("evaluator_modified")
+                and not integrity.get("spec_correction")
+            ):
+                errors.append(f"{location}: accept is invalid after unauthorized evaluator changes")
             for criterion in required_criteria:
                 if criterion["status"] != "met":
                     errors.append(
