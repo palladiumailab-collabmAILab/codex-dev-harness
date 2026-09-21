@@ -37,9 +37,18 @@ try {
         throw "Tracked pre-commit hook must be executable (100755); found $hookMode."
     }
 
-    $agentsSize = (Get-Item -LiteralPath AGENTS.md).Length
-    if ($agentsSize -gt 32768) {
-        throw "AGENTS.md exceeds the default 32 KiB project instruction limit: $agentsSize bytes."
+    $instructionBudgets = @{
+        'AGENTS.md' = 4096
+        'templates/downstream/AGENTS.md' = 3072
+        'profiles/astra/AGENTS.md' = 2048
+        'profiles/sol-luna/AGENTS.md' = 2048
+    }
+    foreach ($relativePath in $instructionBudgets.Keys) {
+        $size = (Get-Item -LiteralPath $relativePath).Length
+        $budget = $instructionBudgets[$relativePath]
+        if ($size -gt $budget) {
+            throw "$relativePath exceeds the harness instruction budget: $size > $budget bytes."
+        }
     }
 
     if ($SkipDocker) {
