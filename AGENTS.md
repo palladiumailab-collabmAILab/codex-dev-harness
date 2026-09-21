@@ -2,6 +2,14 @@
 
 このファイルは全モデル共通の最小入口です。システム・開発者指示とユーザーの明示依頼を優先し、リポジトリ内では現在地に近い `AGENTS.override.md` / `AGENTS.md` を優先します。
 
+## 正本と下流リポジトリ
+
+- 共通ハーネスの正本はこの `palladiumailab-collabmAILab/codex-dev-harness` リポジトリとする。
+- 下流リポジトリへコピーされた共通ハーネスの内容は upstream-managed として扱い、プロジェクト固有の規則・設定・skill 以外を下流で直接書き換えない。
+- 共通ハーネスを変更する必要がある場合は、先にこの正本を変更・検証し、その確定 revision から下流へ同期する。下流だけの独自 fork を作らない。
+- プロジェクト固有の差分は `AGENTS.project.md`、project-specific skill、project docs など明示的に分離した領域へ置き、共通規則を黙って弱めない。
+- 下流リポジトリは `docs/harness-upstream.md` に同期元 revision と upstream-managed file を記録する。
+
 ## モデルプロファイル
 
 作業開始時に、実行中のモデルに対応するプロファイルを **1つだけ** 読みます。複数プロファイルを混ぜません。
