@@ -17,19 +17,24 @@ codex-dev-harness/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   ├── evals/                        # 代表的なevaluation fixtureの説明
 │   └── history/                     # 過去の監査・設計記録
+├── schemas/
+│   └── canonical-model.schema.json  # schema-first canonical model contract
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
 │   ├── self-improvement/
 │   ├── long-running-work/
-│   └── reverse-engineering/         # 任意導入
+│   ├── reverse-engineering/         # 任意導入
+│   └── schema-first-design/         # data modelを横断変更するときだけ使う条件付きskill
 ├── scripts/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
 │   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
-│   └── validate-skills.py
+│   ├── validate-skills.py
+│   └── validate-schema-first.py
 ├── tests/
 └── templates/
     ├── task-prompts/
@@ -67,7 +72,7 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 - `self-improvement`
 - `long-running-work`
 
-特殊用途の `reverse-engineering` は明示的に選択します。
+データモデル横断変更用の `schema-first-design` と特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。どちらも日常の小さな修正向けの既定導入には含めません。
 
 ## Task prompt
 
@@ -141,6 +146,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- schema-first canonical modelのvalid/invalid fixture、参照整合性、決定的レンダー
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
 
@@ -163,6 +169,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
+- canonical data modelから派生成果物を作る設計: `skills/schema-first-design/SKILL.md`
+- schema-first評価: `docs/evals/schema-first-design.md`
 - Astra task prompt: `templates/task-prompts/astra.md`
 - Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`
 

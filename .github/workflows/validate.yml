@@ -33,6 +33,8 @@ jobs:
         run: |
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid
 
       - name: Validate repository invariants
         run: |
