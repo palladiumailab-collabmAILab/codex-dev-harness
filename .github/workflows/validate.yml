@@ -34,6 +34,9 @@ jobs:
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
 
+      - name: Validate harness efficiency evaluation matrix
+        run: python scripts/validate-efficiency-evaluation.py
+
       - name: Validate repository invariants
         run: |
           test "$(wc -c < AGENTS.md)" -le 32768

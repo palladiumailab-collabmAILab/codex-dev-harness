@@ -17,16 +17,19 @@ codex-dev-harness/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   ├── efficiency/                  # harness効率評価の計画・判定基準
 │   └── history/                     # 過去の監査・設計記録
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
+│   ├── harness-efficiency-evaluation/ # 条件付きの効率機構評価
 │   ├── self-improvement/
 │   ├── long-running-work/
 │   └── reverse-engineering/         # 任意導入
 ├── scripts/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
+│   ├── validate-efficiency-evaluation.py
 │   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
 │   └── validate-skills.py
@@ -68,6 +71,8 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 - `long-running-work`
 
 特殊用途の `reverse-engineering` は明示的に選択します。
+
+外部のagent-harness効率機構を比較する `harness-efficiency-evaluation` も条件付きで、実測・hold-out・安全性ゲートが必要なときだけ読みます。
 
 ## Task prompt
 
@@ -134,7 +139,7 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、model-profile separation validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、model-profile separation validation、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
 GitHub Actionsでもpush/PRごとに以下を確認します。
 
@@ -143,6 +148,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Astra と Sol/Luna の profile / task prompt 分離
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
+- harness効率評価matrixのfeature flag / hold-out / metric gate
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
@@ -161,6 +167,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
+- harness効率機構の比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
+- SoL-Pi評価方針と未導入判断: `docs/efficiency/harness-efficiency-evaluation.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
 - Astra task prompt: `templates/task-prompts/astra.md`

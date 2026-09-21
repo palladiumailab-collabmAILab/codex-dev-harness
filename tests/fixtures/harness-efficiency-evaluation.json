@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "task_set_id": "codex-dev-harness-efficiency-smoke-v1",
+  "hold_out_task_ids": [
+    "test-failure-diagnosis",
+    "code-review"
+  ],
+  "tasks": [
+    {
+      "id": "small-bug-fix",
+      "category": "mutation",
+      "verification": "focused regression test"
+    },
+    {
+      "id": "multi-file-change",
+      "category": "mutation",
+      "verification": "repository quality gate"
+    },
+    {
+      "id": "test-failure-diagnosis",
+      "category": "diagnosis",
+      "verification": "reproduced failure and fix evidence"
+    },
+    {
+      "id": "long-log-analysis",
+      "category": "observation",
+      "verification": "source-linked diagnostic conclusion"
+    },
+    {
+      "id": "repository-search",
+      "category": "discovery",
+      "verification": "complete bounded search result"
+    },
+    {
+      "id": "code-review",
+      "category": "review",
+      "verification": "finding or explicit no-material-finding result"
+    },
+    {
+      "id": "documentation-update",
+      "category": "documentation",
+      "verification": "rendered or structural documentation check"
+    }
+  ],
+  "mechanisms": [
+    "action_fusion",
+    "observation_pack",
+    "evidence_preserving_reducer",
+    "online_context_compact"
+  ],
+  "profiles": [
+    {
+      "id": "baseline",
+      "features": {
+        "action_fusion": false,
+        "observation_pack": false,
+        "evidence_preserving_reducer": false,
+        "online_context_compact": false
+      }
+    },
+    {
+      "id": "action-fusion-only",
+      "features": {
+        "action_fusion": true,
+        "observation_pack": false,
+        "evidence_preserving_reducer": false,
+        "online_context_compact": false
+      }
+    },
+    {
+      "id": "observation-pack-only",
+      "features": {
+        "action_fusion": false,
+        "observation_pack": true,
+        "evidence_preserving_reducer": false,
+        "online_context_compact": false
+      }
+    },
+    {
+      "id": "evidence-preserving-reducer-only",
+      "features": {
+        "action_fusion": false,
+        "observation_pack": false,
+        "evidence_preserving_reducer": true,
+        "online_context_compact": false
+      }
+    },
+    {
+      "id": "online-context-compact-only",
+      "features": {
+        "action_fusion": false,
+        "observation_pack": false,
+        "evidence_preserving_reducer": false,
+        "online_context_compact": true
+      }
+    },
+    {
+      "id": "all-enabled",
+      "features": {
+        "action_fusion": true,
+        "observation_pack": true,
+        "evidence_preserving_reducer": true,
+        "online_context_compact": true
+      }
+    }
+  ],
+  "required_metrics": [
+    "task_success",
+    "capability_score",
+    "critical_failure_count",
+    "unsafe_action_count",
+    "input_tokens",
+    "output_tokens",
+    "observation_bytes",
+    "model_call_count",
+    "tool_call_count",
+    "retry_count",
+    "wall_clock_ms",
+    "estimated_cost"
+  ],
+  "gates": {
+    "capability_floor": 1.0,
+    "max_critical_failure_regression": 0,
+    "max_unsafe_action_regression": 0,
+    "min_hold_out_efficiency_improvement": 0.05,
+    "require_raw_traces": true,
+    "require_hold_out": true
+  }
+}

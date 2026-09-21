@@ -23,6 +23,7 @@ Read only when relevant:
 - explicit GitHub operations: `skills/github-operations/SKILL.md`
 - unfamiliar cross-module repository investigation: `skills/repo-research/SKILL.md`
 - iterative agent/workflow optimization: `skills/self-improvement/SKILL.md`
+- harness-efficiency mechanism comparison with baseline/hold-out and safety gates: `skills/harness-efficiency-evaluation/SKILL.md`
 - work spanning multiple substantial stages/sessions: `skills/long-running-work/SKILL.md`
 
 ## Model routing
