@@ -44,5 +44,6 @@
 - `self-improvement`: 既存の agent / prompt / tool / workflow を、baseline と評価基準に対して候補比較しながら反復改善するとき。一回限りの書き換えでは使わない。
 - `long-running-work`: 1回の通常実装パスでは完了できず、複数の大きな段階またはセッション間 handoff が必要なとき。単に手順が複数あるだけでは使わない。
 - `reverse-engineering`: 許可された opaque / legacy / binary / protocol component の観測可能な挙動を、互換性・移行・診断・防御目的で調べるとき。通常のコード読解では使わない。
+- `architecture-design`: module boundary、外部統合、依存方向、実装差し替え、永続化境界、大規模refactor、または明示的な設計レビューで、抽象化やpattern選択の根拠が必要なとき。通常の局所修正では使わない。
 
 該当する skill だけ `SKILL.md` を読みます。全 skill の事前読み込みはしません。

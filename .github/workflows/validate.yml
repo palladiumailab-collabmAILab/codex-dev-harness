@@ -33,6 +33,7 @@ jobs:
         run: |
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
+          python scripts/validate-architecture-evals.py
 
       - name: Validate repository invariants
         run: |
