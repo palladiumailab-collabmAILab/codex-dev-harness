@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/palladiumailab-collabmAILab/codex-dev-harness/schemas/canonical-model.schema.json",
+  "title": "Canonical schema-first design model",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "model_id",
+    "domain",
+    "entities",
+    "relations",
+    "events",
+    "flows",
+    "screens",
+    "api"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "model_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "domain": { "$ref": "#/$defs/named" },
+    "enums": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/enum" }
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relation" }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "flows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/flow" }
+    },
+    "screens": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/screen" }
+    },
+    "api": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/api-operation" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "named": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "enum": {
+      "type": "object",
+      "required": ["id", "name", "values"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": true
+    },
+    "attribute": {
+      "type": "object",
+      "required": ["id", "name", "type", "required", "nullable"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "nullable": { "type": "boolean" },
+        "identifier": { "type": "boolean" },
+        "enum_id": { "$ref": "#/$defs/id" },
+        "constraints": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": true
+    },
+    "entity": {
+      "type": "object",
+      "required": ["id", "name", "attributes", "identifiers"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "attributes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/attribute" }
+        },
+        "identifiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "object" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["entity", "cardinality"],
+      "properties": {
+        "entity": { "$ref": "#/$defs/id" },
+        "cardinality": {
+          "enum": ["one", "zero_or_one", "many", "zero_or_many"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "relation": {
+      "type": "object",
+      "required": ["id", "label", "from", "to"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "from": { "$ref": "#/$defs/endpoint" },
+        "to": { "$ref": "#/$defs/endpoint" }
+      },
+      "additionalProperties": true
+    },
+    "event": {
+      "type": "object",
+      "required": ["id", "name", "entity_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "entity_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      },
+      "additionalProperties": true
+    },
+    "flow-step": {
+      "type": "object",
+      "required": ["id", "label", "next"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "event_id": { "$ref": "#/$defs/id" },
+        "screen_id": { "$ref": "#/$defs/id" },
+        "entity_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "next": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      },
+      "additionalProperties": true
+    },
+    "flow": {
+      "type": "object",
+      "required": ["id", "name", "steps"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/flow-step" } }
+      },
+      "additionalProperties": true
+    },
+    "screen": {
+      "type": "object",
+      "required": ["id", "name", "entity_ids", "event_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "entity_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "event_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      },
+      "additionalProperties": true
+    },
+    "api-mapping": {
+      "type": "object",
+      "required": ["entity", "attribute_ids"],
+      "properties": {
+        "entity": { "$ref": "#/$defs/id" },
+        "attribute_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      },
+      "additionalProperties": true
+    },
+    "api-operation": {
+      "type": "object",
+      "required": ["id", "name", "method", "path", "input", "output"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"] },
+        "path": { "type": "string", "pattern": "^/" },
+        "input": { "$ref": "#/$defs/api-mapping" },
+        "output": { "$ref": "#/$defs/api-mapping" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

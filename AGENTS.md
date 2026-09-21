@@ -22,11 +22,16 @@
 作業開始時に実行モデルに対応する profile を **1つだけ** 読む。
 
 - GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; GPT-6 Astra is optional and not a prerequisite)
 - その他: この共通入口のみ。別モデルの profile を推測で流用しない。
 
 ## 必要時だけ読む
 
+- `repo-research`: 未知のリポジトリ、複雑な依存関係、外部仕様を実装前に調査するとき。
+- `github-operations`: GitHubへの作成・同期・push/pull・Issue・PR等を明示的に依頼されたとき。
+- `code-review`: PR、diff、patch、commit、AI生成コードをレビューするとき、またはレビュー／レビュー中心の回帰分析を明示的に依頼されたとき。通常の実装・修正には使わない。
+- `self-improvement`: agent/workflow を評価付きで反復改善するとき。
+- `long-running-work`: 長時間または複数セッションにまたがる作業を分割・引き継ぐとき。
 - Docker / GitHub Actions / Python-Ruff / 共通仕様配置: `docs/project-baseline.md`
 - task contract / evaluation / optimization semantics: `docs/harness-architecture.md`
 - セッション間 handoff: `templates/codex-progress.md`
@@ -34,6 +39,9 @@
 - 未知の repo を横断調査: `skills/repo-research/SKILL.md`
 - agent / workflow の評価付き反復改善: `skills/self-improvement/SKILL.md`
 - agent harness の効率機構や外部候補を、baseline・hold-out・安全性ゲート付きで比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
+- API / DB / 型 / 業務フロー / UIを横断する canonical data model と派生成果物の整合性を設計する: `skills/schema-first-design/SKILL.md`
+- 抽象化・pattern・module boundary の比較を、具体的な設計圧力と実行可能な根拠に基づいて行う: `skills/architecture-design/SKILL.md`
+- 大規模または混在した asset tree の機械的な inventory・重複排除・候補絞り込み: `skills/asset-extraction/SKILL.md`
 - 複数の大きな段階・セッションにまたがる作業: `skills/long-running-work/SKILL.md`
 - 許可された opaque / legacy / binary / protocol の互換性調査: `skills/reverse-engineering/SKILL.md`
 

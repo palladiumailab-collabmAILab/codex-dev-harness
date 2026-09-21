@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "stage": "render",
+  "outcome": "complete",
+  "inputs": [],
+  "artifacts": [
+    {
+      "path": "published/result.json",
+      "size": 12,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "committed": true
+    }
+  ],
+  "provenance": {
+    "tool": "example-renderer",
+    "runtime": "container@example",
+    "configuration": {"quality": "preview"},
+    "dependencies": {"decoder": "1.0"},
+    "provider_refs": {"artifact_id": "run-001"}
+  },
+  "command": null,
+  "diagnostics": [],
+  "reason": null
+}

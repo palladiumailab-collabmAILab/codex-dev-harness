@@ -16,24 +16,43 @@ codex-dev-harness/
 ├── docs/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
+│   ├── contracts/                    # 実行・評価contractの利用ガイド
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
 │   ├── efficiency/                  # harness効率評価の計画・判定基準
+│   ├── evals/                        # 代表的なrouting/evaluation fixtureの説明
 │   └── history/                     # 過去の監査・設計記録
+├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
+├── schemas/                          # versioned execution/evaluation schemas
+│   └── canonical-model.schema.json  # schema-first canonical model contract
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
 │   ├── harness-efficiency-evaluation/ # 条件付きの効率機構評価
+│   ├── code-review/
 │   ├── self-improvement/
 │   ├── long-running-work/
-│   └── reverse-engineering/         # 任意導入
+│   ├── reverse-engineering/         # 任意導入
+│   ├── architecture-design/         # 構造変更時だけ使う条件付きskill
+│   ├── asset-extraction/            # 大規模asset tree向け、任意導入
+│   └── schema-first-design/         # data modelを横断変更するときだけ使う条件付きskill
 ├── scripts/
+│   ├── harness-provenance.ps1     # manifest / hash / sync primitives
 │   ├── install-githooks.ps1
-│   ├── install-skills.ps1
 │   ├── validate-efficiency-evaluation.py
+│   ├── install-skills.ps1          # first-time install only
+│   ├── sync-skills.ps1             # dry-run and idempotent update
+│   ├── validate-harness-manifest.ps1
 │   ├── validate-harness.ps1
+│   ├── validate-code-review-evals.py
+│   ├── validate-skill-registration.py
 │   ├── validate-model-profiles.py
+│   ├── validate-architecture-evals.py
+│   ├── validate-contracts.py
+│   ├── validate-schema-first.py
 │   └── validate-skills.py
 ├── tests/
+│   ├── test-harness-sync.ps1
+│   └── test-pre-commit.sh
 └── templates/
     ├── task-prompts/
     │   ├── astra.md
@@ -67,10 +86,12 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 
 - `repo-research`
 - `github-operations`
+- `code-review`
 - `self-improvement`
 - `long-running-work`
 
-特殊用途の `reverse-engineering` は明示的に選択します。
+構造変更用の `architecture-design`、データモデル横断変更用の `schema-first-design`、特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。いずれも日常の小さな修正向けの既定導入には含めません。
+大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
 
 外部のagent-harness効率機構を比較する `harness-efficiency-evaluation` も条件付きで、実測・hold-out・安全性ゲートが必要なときだけ読みます。
 
@@ -102,22 +123,55 @@ Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料
 
 新規導入では `templates/downstream/AGENTS.md` を root `AGENTS.md` として使い、プロジェクト固有規則は `AGENTS.project.md` へ分離します。同期元 revision と managed file set は `docs/harness-upstream.md` に記録します。既存の project-specific `AGENTS.md` がある場合は、その固有部分を `AGENTS.project.md` 等へ移し、共通部分と混在させないでください。
 
+対象リポジトリへ必要なSkillをコピーします。既存の共通 `AGENTS.md` は上書きせず、プロジェクト固有ルールは `AGENTS.project.md` に分離します。Skillの導入先を対象リポジトリ内（例: `.codex/skills`）に置き、`harness.lock.json` をコミットすると、導入元commitと管理対象ファイルのhashをCIで監査できます。
 
-Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する4 skillだけをコピーします。
+Codex のユーザー skill ディレクトリへ導入する場合、既定では日常利用する5 skillだけをコピーします。
 
 ```powershell
 pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
 ```
 
-特定skillだけ、または `reverse-engineering` のような特殊用途skillを導入する場合は明示します。
+特定skillだけ、または `reverse-engineering` / `asset-extraction` のような特殊用途skillを導入する場合は明示します。
 
 ```powershell
 pwsh ./scripts/install-skills.ps1 `
   -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills' `
-  -Name repo-research,reverse-engineering
+  -Name repo-research,reverse-engineering,asset-extraction
 ```
 
 既存の同名skillは上書きしません。
+
+初回導入後の更新は `install-skills.ps1` ではなく `sync-skills.ps1` を使います。`install` は既存のSkillディレクトリやmanifestを上書きしないため、誤った再導入でローカル変更を壊しません。
+
+```powershell
+pwsh ./scripts/install-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+
+pwsh ./scripts/sync-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json' `
+  -DryRun
+
+pwsh ./scripts/sync-skills.ps1 `
+  -RepositoryRoot 'C:\path\to\codex-dev-harness' `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+```
+
+Dry-runは `add` / `update` / `unchanged` / `remove` / `conflict` を表示します。manifestに記録したhashと異なるローカル変更は `conflict` として終了コード2で報告し、更新を一切適用しません。管理対象外のファイルはコピー・削除しないため、下流リポジトリ固有のファイルは保持されます。
+
+導入先のCIではmanifest driftを次のように検査できます。
+
+```powershell
+pwsh ./path/to/codex-dev-harness/scripts/validate-harness-manifest.ps1 `
+  -CodexSkillsRoot '.\.codex\skills' `
+  -ManifestPath '.\harness.lock.json'
+```
+
+競合から復旧する場合は、ローカル変更をレビューして別名へ退避した後、manifest記載の旧内容へ戻すか、意図したローカル変更を新しい導入元へ取り込んでから再度 `sync-skills.ps1 -DryRun` を実行します。rollbackは、別のharness checkoutを対象commitに切り替えて同じdry-run/sync手順を使います。いずれもforce pushや無条件上書きは必要ありません。
 
 Git hook は任意です。
 
@@ -139,38 +193,53 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、model-profile separation validation、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、model-profile separation validation、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
 GitHub Actionsでもpush/PRごとに以下を確認します。
 
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- schema-first canonical modelのvalid/invalid fixture、参照整合性、決定的レンダー
+- Sol/Luna の既定route、bounded worker、escalation、profile非混在の代表fixture
+- architecture-design の代表評価fixture（抽象化が有効なケースと過剰設計のケース）
+- execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
 - harness効率評価matrixのfeature flag / hold-out / metric gate
+- provenance-aware skill sync regression transitions
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
 ## モデル既定
 
-- GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+- GPT-6 Astra: `profiles/astra/AGENTS.md` (optional)
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; Astra is not a prerequisite)
 
-Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用しません。
+Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用しません。Sol/Luna を使うときに Astra profile を追加で読む必要はありません。
 
 ## 参照先
 
 - モデル分離: `docs/model-profiles.md`
 - 共通contractと評価ゲート: `docs/harness-architecture.md`
+- GPT-5.6 routing の代表評価: `docs/evals/model-routing.md`
+- 実行・評価contract: `docs/contracts/execution.md`, `docs/contracts/evaluation.md`
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
+- コードレビューとレビュー中心の回帰検証: `skills/code-review/SKILL.md`
+- コードレビュー評価ケース: `docs/evals/code-review.md`
+- コードレビュー方法論の出典記録: `docs/history/code-review-methodology.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - harness効率機構の比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
 - SoL-Pi評価方針と未導入判断: `docs/efficiency/harness-efficiency-evaluation.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
+- canonical data modelから派生成果物を作る設計: `skills/schema-first-design/SKILL.md`
+- schema-first評価: `docs/evals/schema-first-design.md`
+- 構造設計・pattern選択: `skills/architecture-design/SKILL.md`
+- architecture-design の代表評価: `docs/evals/architecture-design.md`
+- 大規模asset treeのinventory/候補抽出: `skills/asset-extraction/SKILL.md`
 - Astra task prompt: `templates/task-prompts/astra.md`
 - Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`
 
