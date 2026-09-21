@@ -27,6 +27,7 @@ try {
     Invoke-Checked 'staged whitespace check' { git diff --cached --check }
     Invoke-Checked 'pre-commit syntax check' { bash -n .githooks/pre-commit }
     Invoke-Checked 'pre-commit behavior tests' { bash tests/test-pre-commit.sh }
+    Invoke-Checked 'harness sync regression tests' { pwsh -NoProfile -NonInteractive -File tests/test-harness-sync.ps1 }
 
     $hookEntry = (& git ls-files -s -- .githooks/pre-commit)
     if ($LASTEXITCODE -ne 0 -or -not $hookEntry) {
@@ -52,7 +53,7 @@ try {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py'
+            docker run --rm --env RUFF_CACHE_DIR=/tmp/ruff-cache --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py'
         }
     }
 

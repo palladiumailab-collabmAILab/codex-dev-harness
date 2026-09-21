@@ -44,3 +44,7 @@ jobs:
           test "$(git ls-files -s -- .githooks/pre-commit | awk '{print $1}')" = '100755'
           bash -n .githooks/pre-commit
           bash tests/test-pre-commit.sh
+
+      - name: Validate provenance-aware skill sync
+        shell: pwsh
+        run: pwsh -NoProfile -NonInteractive -File tests/test-harness-sync.ps1
