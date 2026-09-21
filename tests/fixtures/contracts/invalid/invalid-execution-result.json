@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "stage": "render",
+  "outcome": "complete",
+  "inputs": [
+    {
+      "path": "input.json",
+      "before": {
+        "path": "input.json",
+        "size": 1,
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "after": null,
+      "unchanged": false
+    }
+  ],
+  "artifacts": [],
+  "provenance": null,
+  "command": null,
+  "diagnostics": [],
+  "reason": null
+}

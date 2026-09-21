@@ -10,8 +10,9 @@ The harness separates always-on instructions, conditional task skills, cross-cut
    - detailed procedures loaded only when their trigger conditions apply.
 3. **Project baseline — `docs/project-baseline.md`**
    - reusable defaults such as canonical specifications, Docker reproducibility, and Python/Ruff quality gates without forcing project-specific architecture.
-4. **Cross-cutting contracts — this document / schemas**
+4. **Cross-cutting contracts — this document / `docs/contracts/` / schemas**
    - task goals and acceptance, execution provenance, evaluation decisions, design source-of-truth, optimization records.
+   - `harness_contracts/` provides standard-library helpers for bounded execution, artifact/input identity, and conservative evaluation decisions.
 5. **Mechanical enforcement — `scripts/`, `tests/`, CI**
    - checks stable invariants without relying on model judgment.
 
@@ -46,6 +47,8 @@ The completion contract therefore requires:
 
 For reviewable work, preserve a concise mapping of `criterion -> implementation/change -> evidence`. The mapping may live in a task record, progress file, PR description, or final report; it should not require duplicating full logs.
 
+The executable evaluation contract represents this boundary explicitly with `objective`, `progress`, `evaluator_integrity`, and `traceability` fields. A validation-only iteration is evidence, not material progress; repeated non-progress must trigger a strategy change, blocker report, or criteria clarification. An accepted record must not hide an ambiguous objective, missing criterion evidence, incomplete traceability, or an unjustified evaluator/spec change.
+
 ## Execution result
 
 A long-running or multi-stage workflow should distinguish `complete`, `partial`, and `failed`, and retain enough input/output identity and provenance to reproduce or audit the result.
@@ -61,6 +64,8 @@ Typical provenance may include:
 - optional provider session/turn/artifact references.
 
 A workflow must not report `complete` when required evaluation is unresolved, when verified inputs/outputs changed unexpectedly, or when the task contract still has an unmet required criterion.
+
+The reusable execution helpers in `harness_contracts.execution` turn those rules into a small implementation boundary: fresh run roots, input snapshots, safe artifact publication checks, bounded external commands, and scoped optional-capability results.
 
 ## Evaluation result
 
@@ -78,6 +83,8 @@ The evaluation contract should capture:
 - `accept`, `reject`, or `unresolved` decision.
 
 Use deterministic checks for exact invariants. Use model/hybrid graders when semantic or trajectory quality would be lost by reducing the criterion to an exact check. A small stochastic score delta is not evidence of improvement by itself.
+
+`harness_contracts.evaluation` keeps raw metric observations separate from acceptance thresholds and returns `accept`, `reject`, or `unresolved`. Required criteria without evidence, ties, low confidence, and unresolved measurements cannot be accepted.
 
 ## Canonical design source
 

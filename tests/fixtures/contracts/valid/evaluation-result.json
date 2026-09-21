@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "objective": {
+    "requested_outcome": "publish a verified artifact",
+    "acceptance_criteria": ["artifact-integrity"],
+    "ambiguous": false,
+    "clarification_requested": false,
+    "assumptions": []
+  },
+  "decision": "accept",
+  "criteria": [
+    {
+      "criterion_id": "artifact-integrity",
+      "required": true,
+      "status": "met",
+      "evidence": ["run-001/published/result.json#sha256"],
+      "note": null
+    }
+  ],
+  "raw_metrics": [
+    {
+      "name": "latency",
+      "baseline": 10.0,
+      "candidate": 8.0,
+      "direction": "lower",
+      "improvement": 2.0,
+      "min_improvement": 1.0,
+      "allowed_regression": 0.0,
+      "required": true,
+      "critical": false
+    }
+  ],
+  "acceptance": {
+    "confidence": 0.95,
+    "tied": false,
+    "min_confidence": 0.8,
+    "reasons": []
+  },
+  "evaluator": "deterministic-gate-v1",
+  "progress": {
+    "material_change": true,
+    "validation_only": false,
+    "non_progress_count": 0,
+    "convergence_action": "continue"
+  },
+  "evaluator_integrity": {
+    "evaluator_modified": false,
+    "spec_correction": false,
+    "justification": null
+  },
+  "traceability": [
+    {
+      "criterion_id": "artifact-integrity",
+      "changes": ["artifact generation"],
+      "evidence": ["run-001/published/result.json#sha256"]
+    }
+  ],
+  "provenance": {
+    "harness_version": "90bcc9b",
+    "dataset_version": "fixture-v1"
+  }
+}
