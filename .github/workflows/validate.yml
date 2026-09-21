@@ -36,7 +36,10 @@ jobs:
 
       - name: Validate repository invariants
         run: |
-          test "$(wc -c < AGENTS.md)" -le 32768
+          test "$(wc -c < AGENTS.md)" -le 4096
+          test "$(wc -c < templates/downstream/AGENTS.md)" -le 3072
+          test "$(wc -c < profiles/astra/AGENTS.md)" -le 2048
+          test "$(wc -c < profiles/sol-luna/AGENTS.md)" -le 2048
           git diff --check "$(git hash-object -t tree /dev/null)" HEAD
 
       - name: Validate hook
