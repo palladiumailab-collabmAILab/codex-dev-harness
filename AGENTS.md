@@ -34,6 +34,7 @@
 - 未知の repo を横断調査: `skills/repo-research/SKILL.md`
 - agent / workflow の評価付き反復改善: `skills/self-improvement/SKILL.md`
 - 抽象化・pattern・module boundary の比較を、具体的な設計圧力と実行可能な根拠に基づいて行う: `skills/architecture-design/SKILL.md`
+- 大規模または混在した asset tree の機械的な inventory・重複排除・候補絞り込み: `skills/asset-extraction/SKILL.md`
 - 複数の大きな段階・セッションにまたがる作業: `skills/long-running-work/SKILL.md`
 - 許可された opaque / legacy / binary / protocol の互換性調査: `skills/reverse-engineering/SKILL.md`
 
