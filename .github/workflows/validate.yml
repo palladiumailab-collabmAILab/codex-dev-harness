@@ -33,6 +33,8 @@ jobs:
         run: |
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid
           python scripts/validate-architecture-evals.py
           python -m unittest discover -s tests -p 'test_*.py'
 

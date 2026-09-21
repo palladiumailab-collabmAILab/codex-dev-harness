@@ -57,6 +57,8 @@ try {
         Invoke-Checked 'Ruff format check' { python -m ruff format --check . }
         Invoke-Checked 'skill validation' { python scripts/validate-skills.py skills }
         Invoke-Checked 'model profile validation' { python scripts/validate-model-profiles.py }
+        Invoke-Checked 'schema-first validation' { python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated }
+        Invoke-Checked 'schema-first negative fixture validation' { python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid }
         Invoke-Checked 'architecture evaluation validation' { python scripts/validate-architecture-evals.py }
         Invoke-Checked 'contract unit tests' { python -m unittest discover -s tests -p 'test_*.py' }
         Invoke-Checked 'contract fixture validation' {
@@ -68,7 +70,7 @@ try {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --env RUFF_CACHE_DIR=/tmp/ruff-cache --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python scripts/validate-architecture-evals.py && python -m unittest discover -s tests -p "test_*.py" && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid'
+            docker run --rm --env RUFF_CACHE_DIR=/tmp/ruff-cache --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-model-profiles.py && python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated && python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid && python scripts/validate-architecture-evals.py && python -m unittest discover -s tests -p "test_*.py" && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid && python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid'
         }
     }
 

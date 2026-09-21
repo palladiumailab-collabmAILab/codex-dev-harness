@@ -22,6 +22,7 @@ codex-dev-harness/
 │   └── history/                     # 過去の監査・設計記録
 ├── harness_contracts/                # 標準ライブラリの実行・評価ヘルパー
 ├── schemas/                          # versioned execution/evaluation schemas
+│   └── canonical-model.schema.json  # schema-first canonical model contract
 ├── skills/
 │   ├── repo-research/
 │   ├── github-operations/
@@ -29,7 +30,8 @@ codex-dev-harness/
 │   ├── long-running-work/
 │   ├── reverse-engineering/         # 任意導入
 │   ├── architecture-design/         # 構造変更時だけ使う条件付きskill
-│   └── asset-extraction/            # 大規模asset tree向け、任意導入
+│   ├── asset-extraction/            # 大規模asset tree向け、任意導入
+│   └── schema-first-design/         # data modelを横断変更するときだけ使う条件付きskill
 ├── scripts/
 │   ├── harness-provenance.ps1     # manifest / hash / sync primitives
 │   ├── install-githooks.ps1
@@ -40,6 +42,7 @@ codex-dev-harness/
 │   ├── validate-model-profiles.py
 │   ├── validate-architecture-evals.py
 │   ├── validate-contracts.py
+│   ├── validate-schema-first.py
 │   └── validate-skills.py
 ├── tests/
 │   ├── test-harness-sync.ps1
@@ -80,7 +83,7 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 - `self-improvement`
 - `long-running-work`
 
-構造変更用の `architecture-design` と特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。どちらも日常の小さな修正向けの既定導入には含めません。
+構造変更用の `architecture-design`、データモデル横断変更用の `schema-first-design`、特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。いずれも日常の小さな修正向けの既定導入には含めません。
 大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
 
 ## Task prompt
@@ -188,6 +191,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- schema-first canonical modelのvalid/invalid fixture、参照整合性、決定的レンダー
 - Sol/Luna の既定route、bounded worker、escalation、profile非混在の代表fixture
 - architecture-design の代表評価fixture（抽象化が有効なケースと過剰設計のケース）
 - execution/evaluation contractのunit testとvalid/invalid fixture
@@ -216,6 +220,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
+- canonical data modelから派生成果物を作る設計: `skills/schema-first-design/SKILL.md`
+- schema-first評価: `docs/evals/schema-first-design.md`
 - 構造設計・pattern選択: `skills/architecture-design/SKILL.md`
 - architecture-design の代表評価: `docs/evals/architecture-design.md`
 - 大規模asset treeのinventory/候補抽出: `skills/asset-extraction/SKILL.md`

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "model_id": "commerce",
+  "domain": {
+    "id": "commerce",
+    "name": "Commerce"
+  },
+  "enums": [
+    {
+      "id": "order-status",
+      "name": "Order status",
+      "values": ["draft", "paid", "cancelled"]
+    }
+  ],
+  "entities": [
+    {
+      "id": "customer",
+      "name": "Customer",
+      "attributes": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "uuid",
+          "required": true,
+          "nullable": false,
+          "identifier": true
+        },
+        {
+          "id": "email",
+          "name": "Email",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "constraints": [{"kind": "format", "value": "email"}]
+        }
+      ],
+      "identifiers": [
+        {"id": "customer-primary", "kind": "primary", "attribute_ids": ["id"]}
+      ]
+    },
+    {
+      "id": "order",
+      "name": "Order",
+      "attributes": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "uuid",
+          "required": true,
+          "nullable": false,
+          "identifier": true
+        },
+        {
+          "id": "customer-id",
+          "name": "Customer ID",
+          "type": "uuid",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "id": "status",
+          "name": "Status",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "enum_id": "order-status"
+        },
+        {
+          "id": "total",
+          "name": "Total",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "constraints": [{"kind": "minimum", "value": 0}]
+        }
+      ],
+      "identifiers": [
+        {"id": "order-primary", "kind": "primary", "attribute_ids": ["id"]}
+      ]
+    },
+    {
+      "id": "order-item",
+      "name": "Order item",
+      "attributes": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "uuid",
+          "required": true,
+          "nullable": false,
+          "identifier": true
+        },
+        {
+          "id": "order-id",
+          "name": "Order ID",
+          "type": "uuid",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "id": "sku",
+          "name": "SKU",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "constraints": [{"kind": "min_length", "value": 1}]
+        },
+        {
+          "id": "quantity",
+          "name": "Quantity",
+          "type": "integer",
+          "required": true,
+          "nullable": false,
+          "constraints": [{"kind": "minimum", "value": 1}]
+        }
+      ],
+      "identifiers": [
+        {"id": "order-item-primary", "kind": "primary", "attribute_ids": ["id"]}
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "customer-orders",
+      "label": "places",
+      "from": {"entity": "customer", "cardinality": "one"},
+      "to": {"entity": "order", "cardinality": "zero_or_many"}
+    },
+    {
+      "id": "order-items",
+      "label": "contains",
+      "from": {"entity": "order", "cardinality": "one"},
+      "to": {"entity": "order-item", "cardinality": "zero_or_many"}
+    }
+  ],
+  "events": [
+    {"id": "order-created", "name": "Order created", "entity_ids": ["order"]},
+    {"id": "order-paid", "name": "Order paid", "entity_ids": ["order"]}
+  ],
+  "flows": [
+    {
+      "id": "checkout",
+      "name": "Checkout",
+      "steps": [
+        {
+          "id": "create-order",
+          "label": "Create order",
+          "event_id": "order-created",
+          "screen_id": "order-create",
+          "entity_ids": ["order"],
+          "next": ["pay-order"]
+        },
+        {
+          "id": "pay-order",
+          "label": "Pay order",
+          "event_id": "order-paid",
+          "screen_id": "order-detail",
+          "entity_ids": ["order"],
+          "next": []
+        }
+      ]
+    }
+  ],
+  "screens": [
+    {"id": "order-list", "name": "Order list", "entity_ids": ["order"], "event_ids": []},
+    {
+      "id": "order-create",
+      "name": "Create order",
+      "entity_ids": ["order", "order-item"],
+      "event_ids": ["order-created"]
+    },
+    {
+      "id": "order-detail",
+      "name": "Order detail",
+      "entity_ids": ["order", "order-item"],
+      "event_ids": ["order-paid"]
+    }
+  ],
+  "api": [
+    {
+      "id": "create-order",
+      "name": "Create order",
+      "method": "POST",
+      "path": "/orders",
+      "input": {
+        "entity": "order",
+        "attribute_ids": ["customer-id", "status", "total"]
+      },
+      "output": {
+        "entity": "order",
+        "attribute_ids": ["id", "customer-id", "status", "total"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "model_id": "broken-model",
+  "domain": {"id": "broken", "name": "Broken model"},
+  "enums": [],
+  "entities": [
+    {
+      "id": "account",
+      "name": "Account",
+      "attributes": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "uuid",
+          "required": false,
+          "nullable": true,
+          "identifier": true
+        }
+      ],
+      "identifiers": [
+        {"id": "account-primary", "kind": "primary", "attribute_ids": ["missing"]}
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "account-orders",
+      "label": "owns",
+      "from": {"entity": "account", "cardinality": "many_to_one"},
+      "to": {"entity": "order", "cardinality": "one"}
+    }
+  ],
+  "events": [
+    {"id": "account-changed", "name": "Account changed", "entity_ids": ["missing"]}
+  ],
+  "flows": [
+    {
+      "id": "broken-flow",
+      "name": "Broken flow",
+      "steps": [
+        {
+          "id": "start",
+          "label": "Start",
+          "screen_id": "missing-screen",
+          "next": ["missing-step"]
+        }
+      ]
+    }
+  ],
+  "screens": [
+    {"id": "account-screen", "name": "Account", "entity_ids": ["missing"], "event_ids": []}
+  ],
+  "api": [
+    {
+      "id": "get-account",
+      "name": "Get account",
+      "method": "GET",
+      "path": "/accounts",
+      "input": {"entity": "account", "attribute_ids": ["missing"]},
+      "output": {"entity": "missing", "attribute_ids": []}
+    }
+  ]
+}
