@@ -2,7 +2,7 @@
 
 The execution contract keeps a long-running stage honest about what it observed, published, and completed. It is a reusable pattern, not a domain-specific pipeline implementation.
 
-The reference implementation is in `harness_contracts.execution` and uses only the Python standard library.
+The reference implementation is in `harness_contracts.execution` and uses only the Python standard library. The versioned record shape is `schemas/execution-result.schema.json`; `scripts/validate-contracts.py` adds the cross-field completion checks that a JSON Schema cannot express alone.
 
 ## Run layout
 

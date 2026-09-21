@@ -2,7 +2,7 @@
 
 Execution says what ran. Evaluation says what the observations justify. Keep raw measurements, acceptance thresholds, and the final decision in separate fields.
 
-The reference implementation is in `harness_contracts.evaluation` and uses deterministic rules that are independent of a particular model provider.
+The reference implementation is in `harness_contracts.evaluation` and uses deterministic rules that are independent of a particular model provider. The versioned record shape is `schemas/evaluation-result.schema.json`; optimization candidates use `schemas/optimization-record.schema.json`.
 
 ## Criteria
 
@@ -49,3 +49,10 @@ Ties and low-confidence results cannot report `accept`. Deterministic checks can
 ```
 
 The record distinguishes an observed failure from an unresolved measurement. Do not allow a passing lint/build check to override a separate unmet user criterion.
+
+Validate repository fixtures with:
+
+```powershell
+python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid
+python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid
+```

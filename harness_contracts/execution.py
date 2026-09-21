@@ -11,6 +11,7 @@ from pathlib import Path
 
 CHUNK_SIZE = 1024 * 1024
 SHA256_LENGTH = 64
+EXECUTION_SCHEMA_VERSION = 1
 
 
 class ContractViolation(ValueError):
@@ -151,6 +152,7 @@ class StageResult:
     def to_dict(self) -> dict[str, object]:
         self.validate()
         return {
+            "schema_version": EXECUTION_SCHEMA_VERSION,
             "stage": self.stage,
             "outcome": self.outcome.value,
             "inputs": [record.to_dict() for record in self.inputs],
