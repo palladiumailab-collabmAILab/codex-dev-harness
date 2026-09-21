@@ -19,6 +19,7 @@ Shared rules are managed from `palladiumailab-collabmAILab/codex-dev-harness`; t
 - unfamiliar cross-module repository investigation: `skills/repo-research/SKILL.md`
 - evaluated iterative agent/workflow optimization: `skills/self-improvement/SKILL.md`
 - harness-efficiency mechanism comparison with baseline/hold-out and safety gates: `skills/harness-efficiency-evaluation/SKILL.md`
+- Computer Use decision-backend comparison with fallback, safety, and verification gates: `skills/computer-use-backend-evaluation/SKILL.md`
 - substantial multi-stage or multi-session handoff: `skills/long-running-work/SKILL.md`
 
 ## Model use

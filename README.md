@@ -28,6 +28,7 @@ codex-dev-harness/
 │   ├── repo-research/
 │   ├── github-operations/
 │   ├── harness-efficiency-evaluation/ # 条件付きの効率機構評価
+│   ├── computer-use-backend-evaluation/ # 条件付きのCUA backend比較
 │   ├── code-review/
 │   ├── self-improvement/
 │   ├── long-running-work/
@@ -38,6 +39,7 @@ codex-dev-harness/
 ├── scripts/
 │   ├── harness-provenance.ps1     # manifest / hash / sync primitives
 │   ├── install-githooks.ps1
+│   ├── validate-computer-use-backend-evaluation.py
 │   ├── validate-efficiency-evaluation.py
 │   ├── install-skills.ps1          # first-time install only
 │   ├── sync-skills.ps1             # dry-run and idempotent update
@@ -94,6 +96,8 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
 
 外部のagent-harness効率機構を比較する `harness-efficiency-evaluation` も条件付きで、実測・hold-out・安全性ゲートが必要なときだけ読みます。
+
+Computer Use の判断 backend を比較する `computer-use-backend-evaluation` は、baseline・安全なfallback・最終状態の検証を固定できるときだけ読みます。Jev-cu の導入やGUI操作を自動的に許可するものではありません。
 
 ## Task prompt
 
@@ -233,6 +237,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - harness効率機構の比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
 - SoL-Pi評価方針と未導入判断: `docs/efficiency/harness-efficiency-evaluation.md`
+- Computer Use backend評価: `skills/computer-use-backend-evaluation/SKILL.md`
+- Jev-cu評価方針と未導入判断: `docs/efficiency/jev-cu-evaluation.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
 - canonical data modelから派生成果物を作る設計: `skills/schema-first-design/SKILL.md`

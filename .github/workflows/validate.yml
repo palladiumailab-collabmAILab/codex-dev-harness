@@ -52,6 +52,9 @@ jobs:
       - name: Validate harness efficiency evaluation matrix
         run: python scripts/validate-efficiency-evaluation.py
 
+      - name: Validate Computer Use backend evaluation matrix
+        run: python scripts/validate-computer-use-backend-evaluation.py
+
       - name: Validate repository invariants
         run: |
           test "$(wc -c < AGENTS.md)" -le 4096
