@@ -35,6 +35,7 @@ codex-dev-harness/
 │   ├── validate-harness-manifest.ps1
 │   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
+│   ├── validate-contracts.py
 │   └── validate-skills.py
 ├── tests/
 │   ├── test-harness-sync.ps1
@@ -182,6 +183,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
 - provenance-aware skill sync regression transitions
@@ -199,6 +201,7 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 
 - モデル分離: `docs/model-profiles.md`
 - 共通contractと評価ゲート: `docs/harness-architecture.md`
+- 実行・評価contract: `docs/contracts/execution.md`, `docs/contracts/evaluation.md`
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`

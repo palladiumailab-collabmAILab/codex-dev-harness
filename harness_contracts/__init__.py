@@ -1,11 +1,16 @@
 """Reusable execution and evaluation contracts for long-running harness stages."""
 
 from .evaluation import (
+    ConvergenceAction,
     CriterionResult,
     CriterionStatus,
     Decision,
     EvaluationResult,
+    EvaluatorIntegrity,
     MetricObservation,
+    ProgressRecord,
+    TaskObjective,
+    TraceabilityRecord,
 )
 from .execution import (
     ArtifactRecord,
@@ -32,15 +37,20 @@ __all__ = [
     "ContractViolation",
     "CriterionResult",
     "CriterionStatus",
+    "ConvergenceAction",
     "Decision",
     "EvaluationResult",
+    "EvaluatorIntegrity",
     "InputRecord",
     "InputSnapshot",
     "MetricObservation",
     "OptionalCapabilityUnavailable",
+    "ProgressRecord",
     "Provenance",
     "StageOutcome",
     "StageResult",
+    "TaskObjective",
+    "TraceabilityRecord",
     "capture_input",
     "create_run_root",
     "describe_artifact",
