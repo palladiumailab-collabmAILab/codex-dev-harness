@@ -1,49 +1,35 @@
 # Codex Software Development Harness
 
-This shared file is managed from `palladiumailab-collabmAILab/codex-dev-harness`. Do not edit its common rules in this downstream repository. Update the canonical harness first, then synchronize from a pinned upstream revision recorded in `docs/harness-upstream.md`.
-
-Project-specific instructions belong in `AGENTS.project.md` or explicitly project-specific skills/docs. Read `AGENTS.project.md` when it exists.
+この共通入口は `palladiumailab-collabmAILab/codex-dev-harness` 管理です。下流では共通部分を直接変更せず、project固有規則は `AGENTS.project.md` に置き、存在するときだけ併読します。
 
 ## Common invariants
 
-- Preserve the requested outcome, explicit constraints, and acceptance criteria.
-- Read the relevant `docs/specs/` or existing canonical requirement source before changing durable product/system behavior.
-- Treat tests, lint, builds, CI, evaluations, and inspections as evidence, not as substitutes for the requested outcome. Do not weaken them merely to obtain a pass.
-- Keep changes small and scoped. Do not add unrequested features, dependencies, external integrations, or broad refactors.
-- Preserve unrelated work. Do not use destructive reset/clean/checkout or force push as a default recovery action.
-- Never commit or expose secrets, private keys, tokens, or unnecessary personal data.
-- Do not deploy, incur charges, delete data, change permissions, or write to external services unless the task explicitly authorizes it.
+- 依頼された成果、明示制約、受け入れ条件を変更しない。
+- durable behaviorを変更するときは関連する正本仕様だけを読む。
+- test / lint / build / CI は証拠であり成果そのものではない。合格のためだけに弱めない。
+- 変更を最小範囲に保ち、依頼外機能・依存・大規模refactorを追加しない。
+- unrelated changesを保持し、破壊的 reset / clean / force push を既定にしない。
+- secretsを出力・commit・外部送信しない。未承認のdeploy、課金、削除、権限変更、外部書込みをしない。
+- 同じ情報の無目的な再読込、状態変化のない同一検証の反復を避ける。
 
-## Conditional guidance
+## Conditional references
 
-Read only when relevant:
+必要な項目だけ読む。通常実装で `docs/project-baseline.md` 全体を先読みしない。
 
-- executable software, Docker reproducibility, GitHub Actions, Python/Ruff, or canonical specifications: `docs/project-baseline.md`
-- task contracts, evaluation decisions, long-running execution semantics, or optimization records: `docs/harness-architecture.md`
+- 仕様変更: `docs/baselines/specifications.md`
+- Docker / 再現環境: `docs/baselines/docker.md`
+- GitHub Actions / remote gate: `docs/baselines/github-ci.md`
+- Python / Ruff: `docs/baselines/python-ruff.md`
+- task/evaluation/optimization contract: `docs/harness-architecture.md`
 - explicit GitHub operations: `skills/github-operations/SKILL.md`
-- unfamiliar cross-module repository investigation: `skills/repo-research/SKILL.md`
+- unfamiliar cross-module research: `skills/repo-research/SKILL.md`
 - iterative agent/workflow optimization: `skills/self-improvement/SKILL.md`
-- work spanning multiple substantial stages/sessions: `skills/long-running-work/SKILL.md`
+- multi-session handoff: `skills/long-running-work/SKILL.md`
 
 ## Model routing
 
-- Default: `gpt-5.6-sol / medium` for implementation, architecture, debugging, review, and final integration.
-- Bounded worker: `gpt-5.6-luna / max` for candidate extraction, mechanical transformation, bounded exploration, and independent read-only checks.
-- Escalate from Luna to Sol when the task requires cross-cutting judgment, architectural choice, unresolved debugging, or synthesis across uncertain evidence. Do not repeat the same failed cheap path.
-- Add other routing branches only when explicitly requested or supported by repo-local evaluation.
+- Default: `gpt-5.6-sol / medium`。
+- `gpt-5.6-luna / max` は、独立した限定作業に切り出して Sol のcontext/往復を減らせる場合だけ使う。
+- 短い・局所化済み・handoffの方が高くつくタスクは Sol 単独。Lunaの限定試行が失敗したら反復せず、根拠を短く渡してSolへ戻す。
 
-## Workflow
-
-1. Identify the requested outcome, constraints, acceptance criteria, and smallest relevant change surface.
-2. Read only the relevant project-specific instructions, specifications, code, tests, and configuration.
-3. Implement the smallest sufficient change.
-4. Run proportionate verification.
-5. When GitHub changes are requested, verify the remote artifact and expected GitHub Actions result.
-6. Report the material change, evidence, and unresolved blockers.
-
-## Downstream ownership
-
-- This file and the shared files listed in `docs/harness-upstream.md` are upstream-managed.
-- Do not modify shared rules directly in the downstream repository.
-- Put project-specific requirements, architecture constraints, commands, and exceptions in `AGENTS.project.md` or another clearly project-specific file.
-- If a shared rule must change, update `codex-dev-harness` first and synchronize the resulting revision.
+同期元revisionとmanaged filesは `docs/harness-upstream.md` に記録します。

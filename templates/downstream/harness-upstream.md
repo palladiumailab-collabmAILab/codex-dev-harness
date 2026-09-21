@@ -1,25 +1,20 @@
 # Codex harness upstream
 
-The shared Codex development harness in this repository is sourced from:
-
 - repository: `palladiumailab-collabmAILab/codex-dev-harness`
 - source revision: `<UPSTREAM_COMMIT_SHA>`
 
 ## Ownership
 
-The upstream repository is the canonical source for all shared harness content. Files listed below are upstream-managed and must not be edited independently in this downstream repository. Project-specific rules belong in `AGENTS.project.md` or other explicitly project-specific files.
-
-When a shared rule needs to change:
-
-1. change and validate it in `codex-dev-harness`;
-2. record the new upstream revision here;
-3. synchronize the managed files from that revision;
-4. keep downstream-only changes out of the managed files.
+以下は upstream-managed。共通ルールの変更は正本で検証してから同期し、project固有差分は `AGENTS.project.md` 等へ置く。
 
 ## Upstream-managed files
 
 - `AGENTS.md`
 - `docs/project-baseline.md`
+- `docs/baselines/specifications.md`
+- `docs/baselines/docker.md`
+- `docs/baselines/github-ci.md`
+- `docs/baselines/python-ruff.md`
 - `docs/harness-architecture.md`
 - `skills/repo-research/SKILL.md`
 - `skills/github-operations/SKILL.md`
