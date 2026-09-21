@@ -46,12 +46,14 @@ try {
         Invoke-Checked 'Ruff lint' { python -m ruff check . }
         Invoke-Checked 'Ruff format check' { python -m ruff format --check . }
         Invoke-Checked 'skill validation' { python scripts/validate-skills.py skills }
+        Invoke-Checked 'skill registration validation' { python scripts/validate-skill-registration.py }
+        Invoke-Checked 'code-review evaluation validation' { python scripts/validate-code-review-evals.py }
     }
     else {
         Invoke-Checked 'Docker availability check' { docker info --format '{{.ServerVersion}}' }
         $mount = "type=bind,source=$repositoryRoot,target=/workspace,readonly"
         Invoke-Checked 'containerized harness validation' {
-            docker run --rm --mount $mount python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills'
+            docker run --rm --mount $mount -e RUFF_CACHE_DIR=/tmp/ruff-cache python:3.13-slim sh -c 'python -m pip install --root-user-action=ignore --disable-pip-version-check --no-cache-dir --quiet -r /workspace/requirements-dev.txt && cd /workspace && python -m ruff check . && python -m ruff format --check . && python scripts/validate-skills.py skills && python scripts/validate-skill-registration.py && python scripts/validate-code-review-evals.py'
         }
     }
 

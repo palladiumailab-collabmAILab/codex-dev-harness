@@ -13,6 +13,7 @@ codex-dev-harness/
 ├── docs/
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   ├── evals/                       # task skillの代表評価ケース
 │   └── history/                     # 過去の監査・設計記録
 ├── skills/
 │   ├── repo-research/
@@ -25,6 +26,8 @@ codex-dev-harness/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
 │   ├── validate-harness.ps1
+│   ├── validate-code-review-evals.py
+│   ├── validate-skill-registration.py
 │   └── validate-skills.py
 ├── tests/
 └── templates/
@@ -95,7 +98,7 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format と skill validation を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。GitHub Actionsでもpush/PRごとに同じ主要不変条件を確認します。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverageを再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。GitHub Actionsでもpush/PRごとに同じ主要不変条件を確認します。
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
@@ -115,7 +118,9 @@ Plusで利用可能な GPT-5.6 を前提に、利用枠を重要な判断へ集�
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
-- コードレビューとテスト駆動検証: `skills/code-review/SKILL.md`
+- コードレビューとレビュー中心の回帰検証: `skills/code-review/SKILL.md`
+- コードレビュー評価ケース: `docs/evals/code-review.md`
+- コードレビュー方法論の出典記録: `docs/history/code-review-methodology.md`
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
