@@ -36,6 +36,17 @@ Use the versioned contract at `schemas/canonical-model.schema.json`. At minimum,
 
 The validator is responsible for cross-reference and consistency rules that are awkward to express only in JSON Schema. A model that parses as JSON is not necessarily a valid design.
 
+## Derivation mapping
+
+Use the canonical fields as the mapping contract for implementation outputs:
+
+- API/OpenAPI: each operation's method/path and input/output mapping becomes the endpoint contract; mapped attribute IDs determine the request and response fields.
+- Application types: entity and attribute IDs/names become stable types; canonical attribute types, required, nullable, enum, and constraints become type/validation metadata.
+- SQL/ORM: entities become tables/models, primary identifiers become keys, relation endpoints become foreign-key/association candidates, and nullability/constraints remain explicit migration inputs.
+- UI structure: screens become routes/views, `entity_ids` define their data sources, and `event_ids`/flow steps define user-visible transitions.
+
+Do not silently invent fields while deriving an artifact. If a target technology needs information the canonical model does not express, extend the model or document the explicit project-specific mapping before code generation.
+
 ## Design checks
 
 Before implementation, explicitly check:
@@ -55,4 +66,3 @@ If the model exposes a contradiction, stop at the model boundary and report it i
 - `repo-research` maps existing code and conventions before the model is changed.
 - `architecture-design` handles broader module boundaries, dependency direction, provider isolation, lifecycle, and pattern selection. This skill handles domain/data source-of-truth and derived design artifacts.
 - The model does not authorize unrelated implementation, migration, or deployment changes. Keep derived generation and code changes within the requested scope.
-
