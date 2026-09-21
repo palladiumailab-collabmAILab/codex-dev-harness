@@ -23,7 +23,8 @@ codex-dev-harness/
 │   ├── github-operations/
 │   ├── self-improvement/
 │   ├── long-running-work/
-│   └── reverse-engineering/         # 任意導入
+│   ├── reverse-engineering/         # 任意導入
+│   └── asset-extraction/            # 大規模asset tree向け、任意導入
 ├── scripts/
 │   ├── install-githooks.ps1
 │   ├── install-skills.ps1
@@ -68,6 +69,7 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 - `long-running-work`
 
 特殊用途の `reverse-engineering` は明示的に選択します。
+大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
 
 ## Task prompt
 
@@ -104,12 +106,12 @@ Codex のユーザー skill ディレクトリへ導入する場合、既定で�
 pwsh ./scripts/install-skills.ps1 -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills'
 ```
 
-特定skillだけ、または `reverse-engineering` のような特殊用途skillを導入する場合は明示します。
+特定skillだけ、または `reverse-engineering` / `asset-extraction` のような特殊用途skillを導入する場合は明示します。
 
 ```powershell
 pwsh ./scripts/install-skills.ps1 `
   -CodexSkillsRoot 'C:\Users\<ユーザー名>\.codex\skills' `
-  -Name repo-research,reverse-engineering
+  -Name repo-research,reverse-engineering,asset-extraction
 ```
 
 既存の同名skillは上書きしません。
@@ -163,6 +165,7 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
+- 大規模asset treeのinventory/候補抽出: `skills/asset-extraction/SKILL.md`
 - Astra task prompt: `templates/task-prompts/astra.md`
 - Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`
 
