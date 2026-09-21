@@ -27,6 +27,7 @@ codex-dev-harness/
 │   ├── self-improvement/
 │   ├── long-running-work/
 │   ├── reverse-engineering/         # 任意導入
+│   ├── architecture-design/         # 構造変更時だけ使う条件付きskill
 │   └── asset-extraction/            # 大規模asset tree向け、任意導入
 ├── scripts/
 │   ├── harness-provenance.ps1     # manifest / hash / sync primitives
@@ -36,6 +37,7 @@ codex-dev-harness/
 │   ├── validate-harness-manifest.ps1
 │   ├── validate-harness.ps1
 │   ├── validate-model-profiles.py
+│   ├── validate-architecture-evals.py
 │   ├── validate-contracts.py
 │   └── validate-skills.py
 ├── tests/
@@ -77,7 +79,7 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 - `self-improvement`
 - `long-running-work`
 
-特殊用途の `reverse-engineering` は明示的に選択します。
+構造変更用の `architecture-design` と特殊用途の `reverse-engineering` は、該当時だけ明示的に選択します。どちらも日常の小さな修正向けの既定導入には含めません。
 大規模または混在したasset treeを扱う場合は `asset-extraction` を明示的に選択します。
 
 ## Task prompt
@@ -185,6 +187,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- architecture-design の代表評価fixture（抽象化が有効なケースと過剰設計のケース）
 - execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
@@ -210,6 +213,8 @@ Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用し�
 - agent/workflow自己改善: `skills/self-improvement/SKILL.md`
 - 長時間・複数セッション作業: `skills/long-running-work/SKILL.md`
 - 特殊なblack-box/互換性解析: `skills/reverse-engineering/SKILL.md`
+- 構造設計・pattern選択: `skills/architecture-design/SKILL.md`
+- architecture-design の代表評価: `docs/evals/architecture-design.md`
 - 大規模asset treeのinventory/候補抽出: `skills/asset-extraction/SKILL.md`
 - Astra task prompt: `templates/task-prompts/astra.md`
 - Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`

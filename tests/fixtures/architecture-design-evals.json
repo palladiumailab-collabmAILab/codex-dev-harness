@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "provider-boundary",
+      "prompt": "A checkout domain currently imports one payment provider SDK directly. The product must support two providers, provider contracts change independently, and domain tests need a deterministic fake. Choose the smallest design and explain the boundary.",
+      "expected_decision": "abstraction-justified",
+      "architectural_pressure": [
+        "external-provider-boundary",
+        "replaceability",
+        "testability"
+      ],
+      "candidate_designs": [
+        "adapter-or-port"
+      ],
+      "rejected_patterns": [
+        "repository",
+        "event-bus"
+      ],
+      "evidence_to_collect": [
+        "provider SDK imports in domain/application code",
+        "payment provider contract tests",
+        "checkout tests that need a fake provider"
+      ]
+    },
+    {
+      "id": "single-health-check",
+      "prompt": "Add one local GET /health endpoint to a small service. There is one stable implementation, no provider boundary, no second consumer, and the existing router convention is clear. Choose the smallest design.",
+      "expected_decision": "no-new-abstraction",
+      "architectural_pressure": [],
+      "candidate_designs": [
+        "direct-route-handler"
+      ],
+      "rejected_patterns": [
+        "factory",
+        "repository",
+        "event-bus",
+        "dependency-injection-container"
+      ],
+      "evidence_to_collect": [
+        "existing router convention",
+        "health endpoint response test"
+      ]
+    }
+  ]
+}
