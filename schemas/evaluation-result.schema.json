@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/palladiumailab-collabmAILab/codex-dev-harness/schemas/evaluation-result.schema.json",
+  "title": "Harness evaluation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "objective", "decision", "criteria", "raw_metrics", "acceptance", "evaluator", "progress", "evaluator_integrity", "traceability", "provenance"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "objective": { "$ref": "#/$defs/objective" },
+    "decision": { "enum": ["accept", "reject", "unresolved"] },
+    "criteria": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/criterion" }
+    },
+    "raw_metrics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/metric" }
+    },
+    "acceptance": { "$ref": "#/$defs/acceptance" },
+    "evaluator": { "type": "string", "minLength": 1 },
+    "progress": { "$ref": "#/$defs/progress" },
+    "evaluator_integrity": { "$ref": "#/$defs/evaluator-integrity" },
+    "traceability": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/traceability" }
+    },
+    "provenance": { "type": "object" }
+  },
+  "$defs": {
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested_outcome", "acceptance_criteria", "ambiguous", "clarification_requested", "assumptions"],
+      "properties": {
+        "requested_outcome": { "type": "string", "minLength": 1 },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "ambiguous": { "type": "boolean" },
+        "clarification_requested": { "type": "boolean" },
+        "assumptions": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material_change", "validation_only", "non_progress_count", "convergence_action"],
+      "properties": {
+        "material_change": { "type": "boolean" },
+        "validation_only": { "type": "boolean" },
+        "non_progress_count": { "type": "integer", "minimum": 0 },
+        "convergence_action": {
+          "enum": ["continue", "change-strategy", "surface-blocker", "ask-for-criteria"]
+        }
+      }
+    },
+    "evaluator-integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluator_modified", "spec_correction", "justification"],
+      "properties": {
+        "evaluator_modified": { "type": "boolean" },
+        "spec_correction": { "type": "boolean" },
+        "justification": { "type": ["string", "null"] }
+      }
+    },
+    "traceability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterion_id", "changes", "evidence"],
+      "properties": {
+        "criterion_id": { "type": "string", "minLength": 1 },
+        "changes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "evidence": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterion_id", "required", "status", "evidence", "note"],
+      "properties": {
+        "criterion_id": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "status": { "enum": ["met", "unmet", "unresolved"] },
+        "evidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "note": { "type": ["string", "null"] }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "baseline", "candidate", "direction", "improvement", "min_improvement", "allowed_regression", "required", "critical"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "baseline": { "type": "number" },
+        "candidate": { "type": "number" },
+        "direction": { "enum": ["higher", "lower"] },
+        "improvement": { "type": "number" },
+        "min_improvement": { "type": "number", "minimum": 0 },
+        "allowed_regression": { "type": "number", "minimum": 0 },
+        "required": { "type": "boolean" },
+        "critical": { "type": "boolean" }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confidence", "tied", "min_confidence", "reasons"],
+      "properties": {
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "tied": { "type": "boolean" },
+        "min_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

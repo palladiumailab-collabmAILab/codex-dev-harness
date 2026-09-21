@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "candidate_id": "candidate-002",
+  "parent_candidate_id": "candidate-001",
+  "baseline_id": "baseline-001",
+  "change": {
+    "summary": "Unsafe candidate",
+    "scope": ["harness"],
+    "diff_ref": null
+  },
+  "data": {
+    "optimization_version": "tasks-v1",
+    "holdout_version": "tasks-holdout-v1"
+  },
+  "evaluation": {
+    "decision": "unresolved",
+    "reference": "artifacts/evaluation-result.json"
+  },
+  "acceptance": {
+    "decision": "accepted",
+    "reason": "The proxy score improved."
+  },
+  "provenance": {
+    "harness_version": "90bcc9b",
+    "evaluator": "proxy-only",
+    "experiment_id": "exp-002"
+  }
+}

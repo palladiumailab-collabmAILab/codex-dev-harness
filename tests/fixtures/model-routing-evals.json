@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "default_route": "gpt-5.6-sol / medium",
+    "bounded_worker_route": "gpt-5.6-luna / max",
+    "escalation_target": "gpt-5.6-sol / medium",
+    "profile": "profiles/sol-luna/AGENTS.md",
+    "task_prompt": "templates/task-prompts/sol-luna.md",
+    "max_profile_chars": 1400,
+    "max_task_prompt_chars": 1200
+  },
+  "tasks": [
+    {
+      "id": "small-implementation",
+      "kind": "implementation",
+      "expected_route": "sol",
+      "required_profile": "sol-luna",
+      "reason": "Implementation remains on the default Sol route without an extra model branch.",
+      "additional_profiles": []
+    },
+    {
+      "id": "bounded-search",
+      "kind": "bounded exploration",
+      "expected_route": "luna",
+      "required_profile": "sol-luna",
+      "reason": "A bounded, independently checkable search can use the Luna worker route.",
+      "additional_profiles": []
+    },
+    {
+      "id": "cross-cutting-debug",
+      "kind": "cross-cutting debugging",
+      "expected_route": "sol",
+      "required_profile": "sol-luna",
+      "reason": "Cross-cutting judgment stays on Sol rather than repeating a failing Luna path.",
+      "additional_profiles": []
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "objective": {
+    "requested_outcome": "complete the real device evaluation",
+    "acceptance_criteria": ["real-device-e2e"],
+    "ambiguous": false,
+    "clarification_requested": false,
+    "assumptions": []
+  },
+  "decision": "accept",
+  "criteria": [
+    {
+      "criterion_id": "real-device-e2e",
+      "required": true,
+      "status": "unmet",
+      "evidence": [],
+      "note": "No device was available"
+    }
+  ],
+  "raw_metrics": [
+    {
+      "name": "proxy-score",
+      "baseline": 1.0,
+      "candidate": 2.0,
+      "direction": "higher",
+      "improvement": 1.0,
+      "min_improvement": 0.1,
+      "allowed_regression": 0.0,
+      "required": false,
+      "critical": false
+    }
+  ],
+  "acceptance": {
+    "confidence": 0.99,
+    "tied": false,
+    "min_confidence": 0.8,
+    "reasons": []
+  },
+  "evaluator": "proxy-only",
+  "progress": {
+    "material_change": false,
+    "validation_only": true,
+    "non_progress_count": 1,
+    "convergence_action": "continue"
+  },
+  "evaluator_integrity": {
+    "evaluator_modified": false,
+    "spec_correction": false,
+    "justification": null
+  },
+  "traceability": [
+    {
+      "criterion_id": "real-device-e2e",
+      "changes": ["proxy evaluation"],
+      "evidence": ["proxy-score"]
+    }
+  ],
+  "provenance": {}
+}

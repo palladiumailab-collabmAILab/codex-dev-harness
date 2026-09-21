@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/palladiumailab-collabmAILab/codex-dev-harness/schemas/execution-result.schema.json",
+  "title": "Harness execution result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "stage",
+    "outcome",
+    "inputs",
+    "artifacts",
+    "provenance",
+    "command",
+    "diagnostics",
+    "reason"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "stage": { "type": "string", "minLength": 1 },
+    "outcome": { "enum": ["complete", "partial", "failed"] },
+    "inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/inputRecord" }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "provenance": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/provenance" }
+      ]
+    },
+    "command": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/command" }
+      ]
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reason": { "type": ["string", "null"] }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "size": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "inputRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "before", "after", "unchanged"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "before": { "$ref": "#/$defs/snapshot" },
+        "after": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/snapshot" }
+          ]
+        },
+        "unchanged": { "type": "boolean" }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size", "sha256", "committed"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(?:/|$)).+"
+        },
+        "size": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "committed": { "type": "boolean" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "runtime", "configuration", "dependencies"],
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "configuration": { "type": "object" },
+        "dependencies": { "type": "object", "additionalProperties": { "type": "string" } },
+        "provider_refs": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["argv", "returncode", "stdout", "stderr", "timed_out", "duration_seconds", "succeeded"],
+      "properties": {
+        "argv": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "returncode": { "type": ["integer", "null"] },
+        "stdout": { "type": "string" },
+        "stderr": { "type": "string" },
+        "timed_out": { "type": "boolean" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "succeeded": { "type": "boolean" }
+      }
+    }
+  }
+}
