@@ -33,6 +33,15 @@ jobs:
         run: |
           python scripts/validate-skills.py skills
           python scripts/validate-model-profiles.py
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated
+          python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid
+          python scripts/validate-architecture-evals.py
+          python -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Validate contract fixtures
+        run: |
+          python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/valid
+          python scripts/validate-contracts.py --fixture-root tests/fixtures/contracts/invalid --expect-invalid
 
       - name: Validate skill registration
         run: python scripts/validate-skill-registration.py
@@ -42,7 +51,10 @@ jobs:
 
       - name: Validate repository invariants
         run: |
-          test "$(wc -c < AGENTS.md)" -le 32768
+          test "$(wc -c < AGENTS.md)" -le 4096
+          test "$(wc -c < templates/downstream/AGENTS.md)" -le 3072
+          test "$(wc -c < profiles/astra/AGENTS.md)" -le 2048
+          test "$(wc -c < profiles/sol-luna/AGENTS.md)" -le 2048
           git diff --check "$(git hash-object -t tree /dev/null)" HEAD
 
       - name: Validate hook
@@ -50,3 +62,7 @@ jobs:
           test "$(git ls-files -s -- .githooks/pre-commit | awk '{print $1}')" = '100755'
           bash -n .githooks/pre-commit
           bash tests/test-pre-commit.sh
+
+      - name: Validate provenance-aware skill sync
+        shell: pwsh
+        run: pwsh -NoProfile -NonInteractive -File tests/test-harness-sync.ps1
