@@ -15,7 +15,7 @@
 作業開始時に、実行中のモデルに対応するプロファイルを **1つだけ** 読みます。複数プロファイルを混ぜません。
 
 - GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; GPT-6 Astra is optional and not a prerequisite)
 - その他のモデル: この共通入口だけを適用し、モデル固有の補助指示は推測で流用しません。
 
 ## 共通不変条件

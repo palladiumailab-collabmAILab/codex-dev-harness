@@ -17,6 +17,7 @@ codex-dev-harness/
 │   ├── model-profiles.md            # モデル分離方針
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── project-baseline.md          # 再利用するプロジェクト基準
+│   ├── evals/                        # 代表的なrouting/evaluation fixtureの説明
 │   └── history/                     # 過去の監査・設計記録
 ├── skills/
 │   ├── repo-research/
@@ -141,6 +142,7 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 - Ruff lint / format
 - skill frontmatter
 - Astra と Sol/Luna の profile / task prompt 分離
+- Sol/Luna の既定route、bounded worker、escalation、profile非混在の代表fixture
 - root `AGENTS.md` のサイズ
 - whitespace / hook invariant
 
@@ -148,15 +150,16 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 
 ## モデル既定
 
-- GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
+- GPT-6 Astra: `profiles/astra/AGENTS.md` (optional)
+- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; Astra is not a prerequisite)
 
-Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用しません。
+Sol/Luna の routing 詳細は model profile に限定し、Astra へ流用しません。Sol/Luna を使うときに Astra profile を追加で読む必要はありません。
 
 ## 参照先
 
 - モデル分離: `docs/model-profiles.md`
 - 共通contractと評価ゲート: `docs/harness-architecture.md`
+- GPT-5.6 routing の代表評価: `docs/evals/model-routing.md`
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
 - GitHub操作: `skills/github-operations/SKILL.md`
