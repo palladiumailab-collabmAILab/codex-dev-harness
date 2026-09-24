@@ -21,10 +21,11 @@
 
 ## Work split
 
-- Sol: requirements, plan, architecture, acceptance criteria, test design, protected-oracle ownership, final review/integration.
-- Luna: bounded implementation, new unit tests, test execution, local debugging.
-- Luna が test/spec defect を疑う場合は既存 oracle を変更せず、failure と独立根拠を Sol へ返す。
-- GitHub scope では Luna の protected-oracle change は専用 PR に留め、実装変更と同時に merge しない。
+- Sol: requirements, plan, architecture, acceptance criteria, test design, test-code generation/maintenance, protected-oracle ownership, final review/integration.
+- Luna: bounded implementation, test execution, Issue での結果報告, local debugging.
+- Luna はテストコードや fixture / mock / expected / golden / snapshot / threshold / coverage / CI test conditions を直接変更しない。
+- Luna が test/spec defect を疑う場合は failure と独立根拠を Sol へ返す。
+- GitHub scope では Luna のテスト変更案は review 用 PR に留め、Sol のレビュー・承認なしに merge しない。
 
 ## Failure classification
 
@@ -43,4 +44,4 @@
 - [ ] Outcome と全 AC に証拠がある。
 - [ ] 必須検証が成功、または blocker が明示されている。
 - [ ] oracle を green 化目的で変更していない。
-- [ ] protected-oracle change は根拠とレビュー記録を持つ。
+- [ ] Luna のテスト変更提案は review PR に限定され、Sol の承認前に merge されていない。

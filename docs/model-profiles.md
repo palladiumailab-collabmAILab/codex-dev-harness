@@ -13,9 +13,11 @@ root `AGENTS.md` は共通不変条件と routing だけを持ち、作業時に
 
 Sol/Luna profile ではモデルの差より責務境界を優先する。
 
-- Sol: requirements, plan, architecture, acceptance criteria, test design, protected-oracle ownership, difficult debugging, final review/integration.
-- Luna: bounded implementation, mechanical changes, new unit tests, test execution, local debugging under a defined plan.
-- テストが失敗したとき Luna は既存 oracle を実装へ追随させない。test bug / specification unresolved の疑いは `docs/testing-governance.md` に従って Sol へ返し、protected-oracle change は review PR に分離する。
+- Sol: requirements, plan, architecture, acceptance criteria, test design, test-code generation/maintenance, protected-oracle ownership, difficult debugging, final review/integration.
+- Luna: bounded implementation, mechanical changes, test execution, result reporting, local debugging under a defined plan.
+- Luna はテストコードおよび fixture / mock / expected / golden / snapshot / threshold / coverage / CI test conditions を直接変更しない。
+- テスト変更が必要と考える場合、Luna は review 用 PR として提案し、Sol がレビュー・採否・merge 判断を担う。
+- テストが失敗したとき Luna は oracle を実装へ追随させない。test bug / specification unresolved の疑いは `docs/testing-governance.md` に従って Sol へ返す。
 - bounded worker の範囲を越える判断や反復失敗は Sol へ escalate する。
 
 ## Why Astra is separate

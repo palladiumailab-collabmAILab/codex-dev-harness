@@ -24,28 +24,31 @@
 
 「現在の実装がそう動く」「この変更ならCIが通る」は根拠にならない。
 
-## Test classes
+## Test asset ownership
 
-### Developer tests
+Sol はテスト仕様、テストコード、fixture、mock、expected value、golden file、snapshot、threshold / tolerance、grader / evaluation criterion、coverage 設定、CI のテスト実行条件を含むテスト資産の設計・生成・保守・監査に責任を持つ。
 
-実装担当が通常追加してよいもの。
+Luna はテスト資産を直接変更しない。権限は以下に限定する。
 
-- 新しい unit test
-- 新しい局所 fixture / mock
-- 実装詳細を検証する補助テスト
+- test / lint / build / evaluation の実行
+- 実行結果、失敗分類候補、再現条件、根拠の Issue 報告
+- テスト資産の変更案を review 用 PR として提案
 
-ただし既存の期待値や意味を変更する場合は protected-oracle change として扱う。
+Luna が提出したテスト変更 PR は Sol のレビュー・承認なしに merge しない。
 
-### Protected oracle
+## Protected oracle
 
 次は成功条件を変え得るため、通常の実装変更から分離する。
 
-- 既存 assertion / expected value
+- assertion / expected value
 - regression / acceptance / contract tests
 - golden files / snapshots / reference outputs
 - failure を消す skip / xfail / disable / deletion
-- fixture / mock の変更で期待される意味や入力分布を変えるもの
-- threshold / tolerance / grader / evaluation criterion の緩和
+- fixture / mock の追加・変更・削除
+- threshold / tolerance / grader / evaluation criterion
+- coverage 設定
+- CI の test selection、filter、実行条件、allow-failure 条件
+- 新規 unit test を含むテストコード全般
 
 ## Sol / Luna responsibility
 
@@ -53,44 +56,45 @@
 
 - 要求・制約・acceptance criteria の整理
 - 実装計画とテスト設計
-- protected oracle の所有と変更判断
+- テストコードの生成・保守
+- protected oracle を含むテスト資産全体の所有と変更判断
 - test bug / specification unresolved の裁定
+- Luna からのテスト変更 PR のレビュー・採否判断
 - 難しいデバッグ、最終レビュー、統合判断
 
 **Luna**
 
 - Sol が境界を定めた実装
 - 機械的変更、局所デバッグ
-- 新規 unit test の追加
-- test / lint / build の実行と結果収集
+- test / lint / build / evaluation の実行と結果収集
+- Issue での結果・失敗・再現条件の報告
+- テスト変更が必要と考える場合の review 用 PR 提案
 
-Luna は green 化のために protected oracle を変更しない。test bug または specification unresolved を疑った場合は、失敗を保持して根拠と変更案を Sol に返す。
-
-GitHub 作業では、Luna が protected-oracle change を具体化する必要がある場合も、専用の提案 branch / PR に留め、実装変更と同時に統合しない。merge 判断は Sol のレビューまたはユーザーの明示判断に戻す。
+Luna はテストコードや protected oracle を直接改変しない。test bug または specification unresolved を疑った場合は、失敗を保持して根拠と変更案を Sol に返す。
 
 ## Failure workflow
 
 ```text
-Sol: requirements / plan / test design
-  -> Luna: bounded implementation + developer tests
+Sol: requirements / plan / test design / test asset ownership
+  -> Luna: bounded implementation
   -> Luna: run tests
      -> implementation bug: Luna fixes implementation and reruns
-     -> suspected test bug: preserve failure, attach independent evidence, return proposal to Sol
+     -> suspected test bug: preserve failure, report issue, optionally propose test-only PR
      -> specification unresolved: stop semantic changes and return conflict to Sol
-  -> Sol: review evidence and decide whether implementation, test oracle, or specification changes
-  -> protected-oracle change, if justified: separate review unit / PR
+  -> Sol: review evidence and decide whether implementation, test asset, or specification changes
+  -> test change, if justified: Sol owns approval and merge decision
   -> final verification against the resulting canonical criterion
 ```
 
 ## Review record
 
-Protected-oracle change の提案には最低限次を残す。
+テスト変更の提案には最低限次を残す。
 
 - failing test / criterion
 - classification: test bug or specification unresolved
 - independent evidence
-- why the old oracle is wrong or obsolete
-- exact oracle change
+- why the old oracle or test asset is wrong or obsolete
+- exact proposed change
 - whether the canonical specification also changes
 - regression risk and verification plan
 
