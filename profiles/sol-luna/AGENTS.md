@@ -4,7 +4,7 @@ GPT-5.6 Sol または Luna のときだけ使用する。
 
 ## Routing
 
-- Coordinator: `gpt-5.6-sol / medium` — 要求整理、計画、設計、受け入れ条件、テスト設計、テストコード生成・保守、protected oracle 判断、難しいデバッグ、最終レビューと統合。
+- Coordinator: `gpt-5.6-sol / medium` — 要求整理、計画、設計、受け入れ条件、テスト設計、テストコード生成・保守、protected-oracle change 判断、難しいデバッグ、最終レビューと統合。
 - Worker: `gpt-5.6-luna / max` — Sol で境界が定まった実装、機械的変更、test 実行、局所デバッグ、Issue での結果報告。
 - テスト失敗・変更では `docs/testing-governance.md` に従う。Luna はテストコード、fixture、mock、expected、golden、snapshot、threshold、coverage 設定、CI のテスト実行条件を直接変更しない。
 - Luna がテスト変更を提案する場合は review 用 PR に限定し、Sol のレビュー・承認なしに merge しない。
