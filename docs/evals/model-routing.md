@@ -1,11 +1,12 @@
 # GPT-5.6 routing evaluation
 
-`tests/fixtures/model-routing-evals.json` records three representative task classes:
+`tests/fixtures/model-routing-evals.json` records representative task classes for the Sol/Luna split:
 
-- ordinary implementation uses the default Sol route;
-- bounded, independently checkable exploration may use the Luna worker route;
-- cross-cutting debugging stays on Sol and does not repeat an unsuccessful cheap path.
+- bounded implementation and deterministic test execution route to Luna;
+- bounded independently checkable exploration may route to Luna;
+- protected test-oracle changes route to Sol and are review/PR work, not opportunistic implementation edits;
+- cross-cutting debugging and repeated failure analysis route to Sol.
 
-The fixture also bounds the standalone Sol/Luna profile and task prompt size so that adding routing branches requires an explicit review. `scripts/validate-model-profiles.py` checks the policy text, profile separation, route fixture, and these size limits.
+The fixture also records the canonical implementation/test-execution routes, protected-test owner, and `pr_only` protected-test change mode. `scripts/validate-model-profiles.py` checks those semantics, the standalone profile/task-prompt size limits, and that downstream harness templates reference `docs/testing-governance.md`.
 
-These checks are deterministic routing guardrails, not a claim about measured API token usage or model quality. The repository does not contain a model-runner or token accounting path, so live representative-task latency/usage evidence remains an external evaluation item.
+These checks are deterministic routing guardrails, not a claim about measured API token usage or model quality. Live latency, cost, and task-quality comparisons remain separate evaluation work.

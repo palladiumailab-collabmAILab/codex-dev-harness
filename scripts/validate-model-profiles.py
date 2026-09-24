@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ROUTING_FIXTURE = ROOT / "tests/fixtures/model-routing-evals.json"
+TEST_GOVERNANCE = ROOT / "docs/testing-governance.md"
 
 REQUIRED = (
     ROOT / "profiles/astra/AGENTS.md",
@@ -52,6 +53,10 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
         "default_route": "gpt-5.6-sol / medium",
         "bounded_worker_route": "gpt-5.6-luna / max",
         "escalation_target": "gpt-5.6-sol / medium",
+        "implementation_route": "gpt-5.6-luna / max",
+        "test_execution_route": "gpt-5.6-luna / max",
+        "protected_test_owner_route": "gpt-5.6-sol / medium",
+        "protected_test_change_mode": "pr_only",
     }
     for key, expected in expected_policy.items():
         if policy.get(key) != expected:
@@ -79,8 +84,9 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
     required_markers = (
         "gpt-5.6-sol / medium",
         "gpt-5.6-luna / max",
-        "Luna が受け入れ条件を満たさない",
-        "追加の routing 分岐は",
+        "protected-oracle change",
+        "implementation bug / test bug / specification unresolved",
+        "追加 routing は",
     )
     for marker in required_markers:
         if marker not in sol_profile:
@@ -93,6 +99,7 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
 
     seen_ids: set[str] = set()
     routes: set[str] = set()
+    task_routes: dict[str, str] = {}
     for index, task in enumerate(tasks):
         prefix = f"model-routing evaluation task[{index}]"
         if not isinstance(task, dict):
@@ -109,6 +116,8 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
             errors.append(f"{prefix} expected_route must be sol or luna")
         else:
             routes.add(task["expected_route"])
+            if isinstance(task_id, str) and task_id.strip():
+                task_routes[task_id] = task["expected_route"]
         if task.get("required_profile") != "sol-luna":
             errors.append(f"{prefix} must require only the sol-luna profile")
         if task.get("additional_profiles") != []:
@@ -119,9 +128,24 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
     if routes != {"sol", "luna"}:
         errors.append("model-routing evaluation fixture must cover both Sol and Luna routes")
 
+    required_task_routes = {
+        "small-implementation": "luna",
+        "test-execution": "luna",
+        "protected-test-change": "sol",
+        "cross-cutting-debug": "sol",
+    }
+    for task_id, expected_route in required_task_routes.items():
+        if task_routes.get(task_id) != expected_route:
+            errors.append(
+                f"model-routing task {task_id!r} must route to {expected_route!r}"
+            )
+
 
 def main() -> int:
     errors: list[str] = []
+
+    if not TEST_GOVERNANCE.is_file():
+        errors.append("missing testing governance document: docs/testing-governance.md")
 
     for path in REQUIRED:
         if not path.is_file():
@@ -133,6 +157,16 @@ def main() -> int:
 
     root_agents = read(ROOT / "AGENTS.md")
     readme = read(ROOT / "README.md")
+    downstream_agents = read(ROOT / "templates/downstream/AGENTS.md")
+    downstream_upstream = read(ROOT / "templates/downstream/harness-upstream.md")
+    for location, text in (
+        ("AGENTS.md", root_agents),
+        ("README.md", readme),
+        ("templates/downstream/AGENTS.md", downstream_agents),
+        ("templates/downstream/harness-upstream.md", downstream_upstream),
+    ):
+        if "docs/testing-governance.md" not in text:
+            errors.append(f"{location} must reference docs/testing-governance.md")
     required_routes = {
         "profiles/astra/AGENTS.md": "GPT-6 Astra route is missing from AGENTS.md",
         "profiles/sol-luna/AGENTS.md": "GPT-5.6 Sol/Luna route is missing from AGENTS.md",
