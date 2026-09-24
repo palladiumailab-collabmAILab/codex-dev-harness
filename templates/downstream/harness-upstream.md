@@ -21,6 +21,7 @@ When a shared rule needs to change:
 - `AGENTS.md`
 - `docs/project-baseline.md`
 - `docs/harness-architecture.md`
+- `docs/testing-governance.md`
 - `skills/repo-research/SKILL.md`
 - `skills/github-operations/SKILL.md`
 - `skills/self-improvement/SKILL.md`

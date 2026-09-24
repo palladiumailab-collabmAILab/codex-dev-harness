@@ -2,7 +2,7 @@
 
 ## Outcome
 
-<!-- 依頼された成果を簡潔に書く。 -->
+<!-- 依頼された成果。 -->
 
 ## Scope
 
@@ -16,26 +16,31 @@
 
 ## Required references
 
-<!-- このタスクで必要なものだけを書く。 -->
-
--
+- canonical spec:
+- `docs/testing-governance.md` when tests fail or change:
 
 ## Work split
 
-- Sol: 設計、実装、難しいデバッグ、最終統合。
-- Luna: 独立して切り出せる限定探索、候補抽出、機械的変換、読み取り中心の確認。
-- Luna が局所範囲を越える判断を必要とする場合は、証拠を短くまとめて Sol に戻す。
+- Sol: requirements, plan, architecture, acceptance criteria, test design, protected-oracle ownership, final review/integration.
+- Luna: bounded implementation, new unit tests, test execution, local debugging.
+- Luna が test/spec defect を疑う場合は既存 oracle を変更せず、failure と独立根拠を Sol へ返す。
+- GitHub scope では Luna の protected-oracle change は専用 PR に留め、実装変更と同時に merge しない。
+
+## Failure classification
+
+- implementation bug:
+- test bug:
+- specification unresolved:
 
 ## Verification
 
 - Required checks:
-- Manual / artifact-level checks:
+- Independent oracle/evidence:
 - Remote CI required: yes / no
 
 ## Done when
 
-- [ ] Outcome が実装されている。
-- [ ] 全 Acceptance criteria に対応する証拠がある。
-- [ ] 必須検証が成功している、または実行不能な項目が blocker として明示されている。
-- [ ] 未解決の関連 failure を成功扱いしていない。
-- [ ] GitHub 反映が scope にある場合、要求された remote artifact と CI 状態を確認している。
+- [ ] Outcome と全 AC に証拠がある。
+- [ ] 必須検証が成功、または blocker が明示されている。
+- [ ] oracle を green 化目的で変更していない。
+- [ ] protected-oracle change は根拠とレビュー記録を持つ。
