@@ -57,6 +57,8 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
         "test_execution_route": "gpt-5.6-luna / max",
         "protected_test_owner_route": "gpt-5.6-sol / medium",
         "protected_test_change_mode": "pr_only",
+        "test_asset_owner_route": "gpt-5.6-sol / medium",
+        "luna_test_change_permission": "proposal_pr_only",
     }
     for key, expected in expected_policy.items():
         if policy.get(key) != expected:
@@ -133,6 +135,7 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
         "test-execution": "luna",
         "protected-test-change": "sol",
         "cross-cutting-debug": "sol",
+        "new-unit-test-change": "sol",
     }
     for task_id, expected_route in required_task_routes.items():
         if task_routes.get(task_id) != expected_route:
@@ -209,7 +212,51 @@ def main() -> int:
     if "## Done when" not in read(ROOT / "templates/task-prompts/astra.md"):
         errors.append("Astra task prompt must define Done when")
 
-    validate_routing_fixture(errors, read(ROOT / "profiles/sol-luna/AGENTS.md"))
+    sol_profile = read(ROOT / "profiles/sol-luna/AGENTS.md")
+    sol_prompt = read(ROOT / "templates/task-prompts/sol-luna.md")
+    downstream = read(ROOT / "templates/downstream/AGENTS.md")
+    validate_routing_fixture(errors, sol_profile)
+
+    required_test_ownership_markers = {
+        "profiles/sol-luna/AGENTS.md": (
+            "テストコード",
+            "直接変更しない",
+            "review 用 PR",
+        ),
+        "templates/task-prompts/sol-luna.md": (
+            "テストコード",
+            "直接変更しない",
+            "review 用 PR",
+        ),
+        "templates/downstream/AGENTS.md": (
+            "must not directly change test code or test assets",
+            "review PR",
+            "Sol reviews and approves before merge",
+        ),
+    }
+    ownership_texts = {
+        "profiles/sol-luna/AGENTS.md": sol_profile,
+        "templates/task-prompts/sol-luna.md": sol_prompt,
+        "templates/downstream/AGENTS.md": downstream,
+    }
+    for location, markers in required_test_ownership_markers.items():
+        target = ownership_texts[location]
+        for marker in markers:
+            if marker not in target:
+                errors.append(f"{location} is missing test-ownership marker: {marker}")
+
+    forbidden_luna_test_permissions = (
+        "new unit tests",
+        "新規 unit test の追加",
+        "developer test を追加",
+    )
+    for location, target in ownership_texts.items():
+        lowered = target.lower()
+        for marker in forbidden_luna_test_permissions:
+            if marker.lower() in lowered:
+                errors.append(
+                    f"{location} grants Luna a forbidden direct test-change permission: {marker}"
+                )
 
     if errors:
         print("\n".join(errors))

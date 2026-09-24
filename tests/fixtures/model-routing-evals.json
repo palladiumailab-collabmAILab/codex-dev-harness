@@ -11,7 +11,9 @@
     "profile": "profiles/sol-luna/AGENTS.md",
     "task_prompt": "templates/task-prompts/sol-luna.md",
     "max_profile_chars": 1800,
-    "max_task_prompt_chars": 1600
+    "max_task_prompt_chars": 1600,
+    "test_asset_owner_route": "gpt-5.6-sol / medium",
+    "luna_test_change_permission": "proposal_pr_only"
   },
   "tasks": [
     {
@@ -52,6 +54,14 @@
       "expected_route": "sol",
       "required_profile": "sol-luna",
       "reason": "Cross-cutting judgment and repeated failure analysis return to Sol.",
+      "additional_profiles": []
+    },
+    {
+      "id": "new-unit-test-change",
+      "kind": "test code change",
+      "expected_route": "sol",
+      "required_profile": "sol-luna",
+      "reason": "Generating or modifying test code is owned by Sol; Luna may only propose the change in a review PR.",
       "additional_profiles": []
     }
   ]

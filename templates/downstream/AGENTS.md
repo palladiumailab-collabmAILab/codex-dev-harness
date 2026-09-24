@@ -26,7 +26,7 @@ Shared rules are managed from `palladiumailab-collabmAILab/codex-dev-harness`; t
 ## Model use
 
 - Sol (`gpt-5.6-sol / medium`) owns requirements, planning, architecture, acceptance criteria, test design, protected-oracle decisions, hard debugging, review, and integration.
-- Luna (`gpt-5.6-luna / max`) handles bounded implementation, mechanical changes, new unit tests, test execution, and local debugging under a defined plan.
-- Luna must not rewrite existing assertions/expected values/goldens/snapshots, regression/acceptance/contract tests, or skip/xfail/delete failures merely to obtain green. Suspected test/spec defects return to Sol with evidence; protected-oracle changes stay in a review PR until approved.
+- Luna (`gpt-5.6-luna / max`) handles bounded implementation, mechanical changes, test execution, Issue reporting, and local debugging under a defined plan.
+- Luna must not directly change test code or test assets, including fixtures, mocks, expected values, goldens, snapshots, thresholds, coverage settings, or CI test conditions. Test changes may only be proposed in a review PR; Sol reviews and approves before merge. Suspected test/spec defects return to Sol with evidence.
 
 Shared files listed in `docs/harness-upstream.md` remain upstream-managed; change common rules in the canonical harness first.
