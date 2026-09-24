@@ -136,9 +136,7 @@ def validate_routing_fixture(errors: list[str], sol_profile: str) -> None:
     }
     for task_id, expected_route in required_task_routes.items():
         if task_routes.get(task_id) != expected_route:
-            errors.append(
-                f"model-routing task {task_id!r} must route to {expected_route!r}"
-            )
+            errors.append(f"model-routing task {task_id!r} must route to {expected_route!r}")
 
 
 def main() -> int:
