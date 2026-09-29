@@ -29,10 +29,9 @@ jobs:
           python -m ruff check .
           python -m ruff format --check .
 
-      - name: Validate skills and model profiles
+      - name: Validate skills and harness
         run: |
           python scripts/validate-skills.py skills
-          python scripts/validate-model-profiles.py
           python scripts/validate-schema-first.py --input tests/fixtures/schema-first/valid-model.json --check-generated
           python scripts/validate-schema-first.py --input tests/fixtures/schema-first/invalid-model.json --expect-invalid
           python scripts/validate-architecture-evals.py
@@ -59,8 +58,6 @@ jobs:
         run: |
           test "$(wc -c < AGENTS.md)" -le 4096
           test "$(wc -c < templates/downstream/AGENTS.md)" -le 3072
-          test "$(wc -c < profiles/astra/AGENTS.md)" -le 2048
-          test "$(wc -c < profiles/sol-luna/AGENTS.md)" -le 2048
           git diff --check "$(git hash-object -t tree /dev/null)" HEAD
 
       - name: Validate hook
