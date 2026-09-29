@@ -27,6 +27,16 @@ A detected conflict MUST be resolved in favor of (1), rather than merged by comp
 - https://github.com/openai/role-specific-plugins — official role-specific plugin patterns
 - https://github.com/openai/redcard — official OpenAI security/red-team tooling relevant to adversarial validation
 
+Pinned audit revisions (2026-09-30):
+
+- `openai/codex@a6e9eaa9bd1159db79fba9a0fed482bc93b26047`
+- `openai/codex-security@bc70facbecec7beb7d5fd8a85c543c86d833ca5a`
+- `openai/codex-action@86365089eb2b84e0a8fb0717b304f8bdcb13b20e`
+- `openai/codex-universal@47f4f0eb5337083e2f610db0d15558932cb4901d`
+- `openai/skills@49f948faa9258a0c61caceaf225e179651397431`
+- `openai/role-specific-plugins@fe5608d2512a7d6a7b9821ce8a88c48464ecd6e4`
+- `openai/redcard@7425e60c469c51960367bfe8b4608781a548220c`
+
 ## Integration policy
 
 Do not vendor or fork official repositories merely to keep a stale local copy. Pin an upstream revision when reproducibility requires it and record provenance.
