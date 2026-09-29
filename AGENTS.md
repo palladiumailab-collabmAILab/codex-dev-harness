@@ -1,12 +1,13 @@
 # Codex Software Development Harness
 
-このファイルは常時読む最小入口です。詳細手順は必要なときだけ対応する profile / docs / skill を読みます。
+このファイルは常時読む最小入口です。詳細手順は必要なときだけ対応する docs / skill を読みます。
 
 ## 正本
 
-- 共通ハーネスの正本は `palladiumailab-collabmAILab/codex-dev-harness`。
-- 下流の共通ファイルは upstream-managed とし、共通ルールは正本で変更してから同期する。
-- プロジェクト固有ルールは `AGENTS.project.md`、project-specific skill / docs に分離する。
+- OpenAI公式の Codex / skills / security / action / runtime が最上位の正本。
+- このリポジトリは公式挙動を上書きせず、非衝突の補助規則だけを提供する。
+- 下流の共通ファイルは upstream-managed とし、プロジェクト固有ルールは `AGENTS.project.md`、project-specific skill / docs に分離する。
+- 公式とローカルが衝突した場合は、`docs/openai-official-harness.md` に従い公式を優先する。
 
 ## 共通不変条件
 
@@ -16,34 +17,27 @@
 - 変更は必要最小限にし、無関係な変更を保持する。破壊的 reset / clean / checkout や force push を既定にしない。
 - 秘密情報を出力・コミット・送信しない。依頼のない deploy、課金、削除、権限変更、外部書き込みを行わない。
 - 最寄りの指示、必要な仕様・コード・テスト・設定だけを読み、無目的な全件走査や巨大ログ展開を避ける。
-
-## モデル profile
-
-作業開始時に実行モデルに対応する profile を **1つだけ** 読む。
-
-- GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; GPT-6 Astra is optional and not a prerequisite)
-- その他: この共通入口のみ。別モデルの profile を推測で流用しない。
+- モデル名・モデル役割・既定モデルをローカルで固定しない。Codex の公式挙動と利用可能モデルをその時点の正本とする。
 
 ## 必要時だけ読む
 
 - `repo-research`: 未知のリポジトリ、複雑な依存関係、外部仕様を実装前に調査するとき。
 - `github-operations`: GitHubへの作成・同期・push/pull・Issue・PR等を明示的に依頼されたとき。
-- `code-review`: PR、diff、patch、commit、AI生成コードをレビューするとき、またはレビュー／レビュー中心の回帰分析を明示的に依頼されたとき。通常の実装・修正には使わない。
+- `code-review`: PR、diff、patch、commit、AI生成コードをレビューするとき。
 - `self-improvement`: agent/workflow を評価付きで反復改善するとき。
 - `long-running-work`: 長時間または複数セッションにまたがる作業を分割・引き継ぐとき。
+- OpenAI公式との優先順位と統合: `docs/openai-official-harness.md`
 - Docker / GitHub Actions / Python-Ruff / 共通仕様配置: `docs/project-baseline.md`
 - task contract / evaluation / optimization semantics: `docs/harness-architecture.md`
 - セッション間 handoff: `templates/codex-progress.md`
 - GitHub remote 操作: `skills/github-operations/SKILL.md`
 - 未知の repo を横断調査: `skills/repo-research/SKILL.md`
 - agent / workflow の評価付き反復改善: `skills/self-improvement/SKILL.md`
-- agent harness の効率機構や外部候補を、baseline・hold-out・安全性ゲート付きで比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
-- Computer Use の decision backend を baseline と比較し、fallback・safety・latency・verification を評価: `skills/computer-use-backend-evaluation/SKILL.md`
-- API / DB / 型 / 業務フロー / UIを横断する canonical data model と派生成果物の整合性を設計する: `skills/schema-first-design/SKILL.md`
-- 抽象化・pattern・module boundary の比較を、具体的な設計圧力と実行可能な根拠に基づいて行う: `skills/architecture-design/SKILL.md`
-- 大規模または混在した asset tree の機械的な inventory・重複排除・候補絞り込み: `skills/asset-extraction/SKILL.md`
-- 複数の大きな段階・セッションにまたがる作業: `skills/long-running-work/SKILL.md`
+- agent harness の効率機構や外部候補を比較評価: `skills/harness-efficiency-evaluation/SKILL.md`
+- Computer Use の decision backend を比較評価: `skills/computer-use-backend-evaluation/SKILL.md`
+- canonical data model と派生成果物の整合性設計: `skills/schema-first-design/SKILL.md`
+- 抽象化・pattern・module boundary の比較: `skills/architecture-design/SKILL.md`
+- 大規模 asset tree の inventory・重複排除・候補絞り込み: `skills/asset-extraction/SKILL.md`
 - 許可された opaque / legacy / binary / protocol の互換性調査: `skills/reverse-engineering/SKILL.md`
 
-該当するものだけ読む。全 profile / docs / skill の先読みは禁止。
+該当するものだけ読む。全 docs / skill の先読みは禁止。
