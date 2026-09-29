@@ -1,6 +1,6 @@
 # Codex 開発ハーネス
 
-Codex をソフトウェア開発に使うための再利用可能なハーネスです。共通の最小入口、モデル別 profile、条件付き task skill、共通 contract、project baseline、task prompt、機械的 validation を分離します。
+Codex をソフトウェア開発に使うための再利用可能な補助ハーネスです。OpenAI公式の Codex / skills / security / action / runtime を最上位の正本とし、このリポジトリは非衝突の補助規則・評価・同期機構だけを提供します。
 
 ## 構成
 
@@ -10,11 +10,8 @@ codex-dev-harness/
 ├── .github/workflows/validate.yml   # push/PR時の検証
 ├── .githooks/pre-commit             # 任意の軽量チェック
 ├── pyproject.toml                   # このハーネス自身のRuff設定
-├── profiles/
-│   ├── astra/AGENTS.md              # GPT-6 Astra固有
-│   └── sol-luna/AGENTS.md           # GPT-5.6 Sol/Luna固有
 ├── docs/
-│   ├── model-profiles.md            # モデル分離方針
+
 │   ├── harness-architecture.md      # 共通contractの意味
 │   ├── testing-governance.md         # AI実装とテストoracleの変更統制
 │   ├── contracts/                    # 実行・評価contractの利用ガイド
@@ -48,7 +45,6 @@ codex-dev-harness/
 │   ├── validate-harness.ps1
 │   ├── validate-code-review-evals.py
 │   ├── validate-skill-registration.py
-│   ├── validate-model-profiles.py
 │   ├── validate-architecture-evals.py
 │   ├── validate-contracts.py
 │   ├── validate-schema-first.py
@@ -57,9 +53,6 @@ codex-dev-harness/
 │   ├── test-harness-sync.ps1
 │   └── test-pre-commit.sh
 └── templates/
-    ├── task-prompts/
-    │   ├── astra.md
-    │   └── sol-luna.md
     ├── codex-progress.md
     ├── downstream/
     │   ├── AGENTS.md                # 下流向け共通入口（upstream-managed）
@@ -68,18 +61,11 @@ codex-dev-harness/
     └── project-specs/README.md      # 対象repoの docs/specs/ 用ひな形
 ```
 
-詳細な手順は root `AGENTS.md` に複製せず、対応する model profile と、発火条件に一致した skill / docs だけを参照します。
+詳細な手順は root `AGENTS.md` に複製せず、発火条件に一致した skill / docs だけを参照します。
 
-## モデル分離
+## OpenAI公式との関係
 
-root `AGENTS.md` は共通不変条件と routing だけを持ちます。作業時には対応する profile を1つだけ読み、Astra と Sol/Luna の補助指示を混ぜません。
-
-- GPT-6 Astra: `profiles/astra/AGENTS.md`
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md`
-
-Astra profile は、必要な guidance の条件付き読み込み、安全なローカル作業の継続、明示的な Done を重視します。Sol/Luna profile は従来の明示的な workflow と Sol/Luna routing を保持します。
-
-詳細は `docs/model-profiles.md` を参照してください。
+OpenAI公式の挙動・モデル選択・skills・security・GitHub Action・runtime をローカル規則で上書きしません。競合時の優先順位と統合方針は `docs/openai-official-harness.md` を正本とします。モデル名や役割分担をこのリポジトリで固定しません。
 
 ## Skill
 
@@ -99,15 +85,6 @@ skill は model-neutral に保ちます。frontmatter の description は「何�
 外部のagent-harness効率機構を比較する `harness-efficiency-evaluation` も条件付きで、実測・hold-out・安全性ゲートが必要なときだけ読みます。
 
 Computer Use の判断 backend を比較する `computer-use-backend-evaluation` は、baseline・安全なfallback・最終状態の検証を固定できるときだけ読みます。Jev-cu の導入やGUI操作を自動的に許可するものではありません。
-
-## Task prompt
-
-モデル別の task prompt を分離しています。
-
-- Astra: `templates/task-prompts/astra.md`
-- Sol/Luna: `templates/task-prompts/sol-luna.md`
-
-Astra 用 prompt は Outcome / Scope / Constraints / 必要時だけ読む資料 / Done when を明示し、最初の実装で止まらず必要な検証と修正まで継続する許可を含みます。
 
 ## プロジェクト基準
 
@@ -198,15 +175,13 @@ Windowsでは次を実行します。
 pwsh ./scripts/validate-harness.ps1
 ```
 
-既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、model-profile separation validation、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
+既定では Docker を使い、ハーネス自身の Ruff lint / format、skill validation、skill登録整合性、代表評価ケースのcoverage、効率評価matrixの整合性検証を再現可能な環境で実行します。ホストPythonへ `requirements-dev.txt` の依存関係を導入済みなら `-SkipDocker` も使えます。
 
 GitHub Actionsでもpush/PRごとに以下を確認します。
 
 - Ruff lint / format
 - skill frontmatter
-- Astra と Sol/Luna の profile / task prompt 分離
 - schema-first canonical modelのvalid/invalid fixture、参照整合性、決定的レンダー
-- Sol/Luna の既定route、bounded worker、escalation、profile非混在の代表fixture
 - architecture-design の代表評価fixture（抽象化が有効なケースと過剰設計のケース）
 - execution/evaluation contractのunit testとvalid/invalid fixture
 - root `AGENTS.md` のサイズ
@@ -216,19 +191,10 @@ GitHub Actionsでもpush/PRごとに以下を確認します。
 
 対象プロジェクトでも、ローカル/Docker検証は事前確認として扱い、GitHubへ反映した変更は対象commitまたはPRのGitHub Actions結果まで確認します。期待されるCIが存在しない、実行不能、または失敗している場合は、遠隔検証済みとは扱いません。
 
-## モデル既定
-
-- GPT-6 Astra: `profiles/astra/AGENTS.md` (optional)
-- GPT-5.6 Sol / Luna: `profiles/sol-luna/AGENTS.md` (standalone; Astra is not a prerequisite)
-
-Sol/Luna は Sol を planner / test owner / reviewer、Luna を bounded implementer / test runner として分離します。既存 oracle の意味変更は `docs/testing-governance.md` に従い、Luna の protected-oracle change は review PR に留めます。Astra profile は追加で読みません。
-
 ## 参照先
 
-- モデル分離: `docs/model-profiles.md`
 - 共通contractと評価ゲート: `docs/harness-architecture.md`
 - テストoracleとSol/Lunaの変更統制: `docs/testing-governance.md`
-- GPT-5.6 routing の代表評価: `docs/evals/model-routing.md`
 - 実行・評価contract: `docs/contracts/execution.md`, `docs/contracts/evaluation.md`
 - プロジェクト共通基準: `docs/project-baseline.md`
 - 未知のrepo調査: `skills/repo-research/SKILL.md`
@@ -248,7 +214,5 @@ Sol/Luna は Sol を planner / test owner / reviewer、Luna を bounded implemen
 - 構造設計・pattern選択: `skills/architecture-design/SKILL.md`
 - architecture-design の代表評価: `docs/evals/architecture-design.md`
 - 大規模asset treeのinventory/候補抽出: `skills/asset-extraction/SKILL.md`
-- Astra task prompt: `templates/task-prompts/astra.md`
-- Sol/Luna task prompt: `templates/task-prompts/sol-luna.md`
 
 設計方針はOpenAIの公開するHarness Engineering、AGENTS.md、Subagents、モデルガイダンスを一次資料として扱います。
