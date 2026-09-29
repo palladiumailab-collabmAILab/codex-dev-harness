@@ -2,6 +2,13 @@
 
 Shared rules are managed from `palladiumailab-collabmAILab/codex-dev-harness`; the pinned revision is recorded in `docs/harness-upstream.md`. Keep project-specific rules in `AGENTS.project.md` or explicitly project-specific skills/docs, and read `AGENTS.project.md` when present.
 
+## Authority
+
+- OpenAI-maintained Codex, skills, security, action, and runtime behavior is authoritative.
+- Shared local harness rules may extend only non-conflicting gaps.
+- Never pin model names, model roles, or a default model in downstream harness instructions; follow the current official Codex behavior.
+- If an official rule and a local rule conflict, the official rule wins.
+
 ## Common invariants
 
 - Preserve the requested outcome, explicit constraints, and acceptance criteria.
@@ -13,20 +20,15 @@ Shared rules are managed from `palladiumailab-collabmAILab/codex-dev-harness`; t
 
 ## Read only when relevant
 
+- OpenAI precedence/integration: `docs/openai-official-harness.md`
 - Docker / GitHub Actions / Python-Ruff / shared specification layout: `docs/project-baseline.md`
 - task contracts / evaluation / optimization semantics: `docs/harness-architecture.md`
-- test failures, oracle changes, and Sol/Luna test ownership: `docs/testing-governance.md`
+- test failures and oracle changes: `docs/testing-governance.md`
 - explicit GitHub remote operations: `skills/github-operations/SKILL.md`
 - unfamiliar cross-module repository investigation: `skills/repo-research/SKILL.md`
 - evaluated iterative agent/workflow optimization: `skills/self-improvement/SKILL.md`
-- harness-efficiency mechanism comparison with baseline/hold-out and safety gates: `skills/harness-efficiency-evaluation/SKILL.md`
-- Computer Use decision-backend comparison with fallback, safety, and verification gates: `skills/computer-use-backend-evaluation/SKILL.md`
+- harness-efficiency comparison: `skills/harness-efficiency-evaluation/SKILL.md`
+- Computer Use decision-backend comparison: `skills/computer-use-backend-evaluation/SKILL.md`
 - substantial multi-stage or multi-session handoff: `skills/long-running-work/SKILL.md`
-
-## Model use
-
-- Sol (`gpt-5.6-sol / medium`) owns requirements, planning, architecture, acceptance criteria, test design, protected-oracle decisions, hard debugging, review, and integration.
-- Luna (`gpt-5.6-luna / max`) handles bounded implementation, mechanical changes, test execution, Issue reporting, and local debugging under a defined plan.
-- Luna must not directly change test code or test assets, including fixtures, mocks, expected values, goldens, snapshots, thresholds, coverage settings, or CI test conditions. Test changes may only be proposed in a review PR; Sol reviews and approves before merge. Suspected test/spec defects return to Sol with evidence.
 
 Shared files listed in `docs/harness-upstream.md` remain upstream-managed; change common rules in the canonical harness first.
